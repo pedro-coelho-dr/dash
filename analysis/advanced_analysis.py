@@ -1,46 +1,70 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
+import altair as alt
+from sqlalchemy import create_engine
+from database.db_handler import get_all_transactions
 
+# Function to load transactions from the database and return them as a pandas DataFrame
+def load_transactions():
+    # Fetch transactions from the database
+    transactions = get_all_transactions()
+
+    # Convert to a pandas DataFrame for easy manipulation
+    data = {
+        'date': [t.date for t in transactions],
+        'type': [t.type for t in transactions],
+        'value': [t.value for t in transactions],
+        'category': [t.category for t in transactions],
+        'description': [t.description for t in transactions],
+    }
+
+    return pd.DataFrame(data)
+
+# Function for generating bar charts
+def plot_bar_chart(df):
+    st.subheader("Bar Chart: Total by Category")
+    bar_data = df.groupby('category')['value'].sum()
+    st.bar_chart(bar_data)
+
+# Function for generating line charts
+def plot_line_chart(df):
+    st.subheader("Line Chart: Value Over Time")
+    df_sorted = df.sort_values(by='date')
+    st.line_chart(df_sorted.set_index('date')['value'])
+
+# Function for generating area charts
+def plot_area_chart(df):
+    st.subheader("Area Chart: Cumulative Value Over Time")
+    df_sorted = df.sort_values(by='date')
+    df_sorted['cumulative_value'] = df_sorted['value'].cumsum()
+    st.area_chart(df_sorted.set_index('date')['cumulative_value'])
+
+# Function for generating scatter plots
+def plot_scatter_chart(df):
+    st.subheader("Scatter Plot: Value by Category")
+    fig = px.scatter(df, x='category', y='value', color='type', size='value',
+                     title='Scatter Plot of Transaction Value by Category')
+    st.plotly_chart(fig)
+
+# Advanced Analysis section
 def advanced_analysis():
     st.title("Análise Avançada - Comparação de Categorias")
 
-    # Dados fictícios
-    data = {
-        'type': ['Receita', 'Receita', 'Despesa', 'Despesa', 'Despesa', 'Receita'],
-        'value': [1000, 1500, 700, 400, 300, 2000],
-        'category': ['Serviço', 'Venda', 'Materiais', 'Salário', 'Ferramentas', 'Manutenção']
-    }
+    # Load transactions from the database
+    df = load_transactions()
 
-    df = pd.DataFrame(data)
+    if not df.empty:
+        # Display different charts
+        plot_bar_chart(df)
+        plot_line_chart(df)
+        plot_area_chart(df)
+        plot_scatter_chart(df)
 
-    # Filtrar receitas e despesas
-    income = df[df['type'] == 'Receita']
-    expenses = df[df['type'] == 'Despesa']
+    else:
+        st.write("No data available.")
 
-    # Função para exibir o gráfico de comparação de categorias
-    def plot_category_comparison():
-        # Agrupar por categoria e somar valores
-        expense_summary = expenses.groupby('category')['value'].sum()
-        income_summary = income.groupby('category')['value'].sum()
-
-        # Criar os gráficos
-        fig, ax = plt.subplots(1, 2, figsize=(12, 6))
-
-        # Gráfico de despesas
-        ax[0].bar(expense_summary.index, expense_summary.values, color='red')
-        ax[0].set_title('Despesas por Categoria')
-        ax[0].set_ylabel('Valor (R$)')
-        ax[0].set_xlabel('Categoria')
-
-        # Gráfico de receitas
-        ax[1].bar(income_summary.index, income_summary.values, color='green')
-        ax[1].set_title('Receitas por Categoria')
-        ax[1].set_ylabel('Valor (R$)')
-        ax[1].set_xlabel('Categoria')
-
-        # Exibir o gráfico no Streamlit
-        st.pyplot(fig)
-
-    # Chama a função para exibir o gráfico
-    plot_category_comparison()
+# Running the advanced analysis
+if __name__ == '__main__':
+    advanced_analysis()

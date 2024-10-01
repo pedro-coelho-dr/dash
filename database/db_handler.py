@@ -51,3 +51,9 @@ def add_transaction(date, type_, value, category, description, payment_method, d
 # Função para buscar todas as transações
 def get_all_transactions():
     return session.query(Transaction).all()
+
+
+def clear_transactions():
+    session.query(Transaction).delete()
+    session.commit()
+    print("Database cleared.")
