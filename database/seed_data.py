@@ -1,48 +1,68 @@
-from db_handler import add_transaction, clear_transactions
+from db_handler import add_transaction, clear_transactions, add_category, get_all_categories
 from datetime import date, timedelta
 import random
+from db_handler import PaymentMethodEnum, TransactionTypeEnum, BankEnum
 
-
-# Function to populate the database with 30 sample data entries
+# Função para popular o banco de dados com 30 entradas de exemplo
 def seed_data():
-    # Clear the database before seeding
+    # Limpar o banco de dados antes de popular
     clear_transactions()
 
-    # Define some sample categories, descriptions, and payment methods
-    categories = ['Venda de Produto', 'Serviço', 'Materiais', 'Salário', 'Manutenção']
-    descriptions = ['Venda A', 'Conserto', 'Compra Material', 'Salário Mensal', 'ReAparo Máquina']
-    payment_methods = ['Dinheiro', 'Crédito', 'Boleto', 'Transferência Bancária']
+    # Definir algumas categorias iniciais
+    predefined_categories = ['Venda de Produto', 'Serviço', 'Materiais', 'Salário', 'Manutenção']
 
-    # Generate 30 sample transactions
-    start_date = date(2024, 9, 1)  # Starting date for transactions
+    # Adicionar as categorias no banco de dados
+    for category in predefined_categories:
+        add_category(category)
+
+    # Buscar todas as categorias disponíveis no banco de dados
+    available_categories = get_all_categories()
+
+    # Definir algumas descrições para as transações
+    descriptions = ['Venda A', 'Conserto', 'Compra Material', 'Salário Mensal', 'ReAparo Máquina']
+
+    # Gerar 30 transações de exemplo
+    start_date = date(2024, 9, 1)  # Data de início das transações
 
     for i in range(30):
-        # Generate random transaction data
-        trans_date = start_date + timedelta(days=i)  # Increment each transaction by 1 day
-        type_ = random.choice(['Receita', 'Despesa'])  # Randomly choose Receita or Despesa
-        value = round(random.uniform(100, 2000), 2)  # Random value between 100 and 2000
-        category = random.choice(categories)
-        description = random.choice(descriptions)
-        payment_method = random.choice(payment_methods)
-        document_number = str(random.randint(10000, 99999))  # Random 5-digit document number
-        responsible = random.choice(['João', 'Maria', 'Carlos', 'Ana'])
-        notes = 'Notas de teste' if random.random() > 0.5 else ''  # Randomly add notes
+        # Gerar dados aleatórios para a transação
+        trans_date = start_date + timedelta(days=i)  # Incrementa cada transação em 1 dia
+        
+        # Escolher entre CREDITO e DEBITO (com os valores exatos do Enum)
+        type_ = random.choice([TransactionTypeEnum.CREDITO, TransactionTypeEnum.DEBITO])  
+        
+        # Valor entre 100 e 2000
+        value = round(random.uniform(100, 2000), 2)  
 
-        # Add the transaction to the database
+        # Descrição aleatória
+        description = random.choice(descriptions)
+        
+        # Selecionar um método de pagamento do enum PaymentMethodEnum
+        payment_method = random.choice(list(PaymentMethodEnum))  # Usar os valores exatos do Enum
+        
+        # Selecionar um banco do enum BankEnum
+        bank = random.choice(list(BankEnum))  # Usar os valores exatos do Enum
+        
+        # Escolher 1 a 3 categorias aleatórias
+        categories = random.sample(available_categories, random.randint(1, 3))
+        
+        # Aleatoriamente adicionar notas
+        notes = 'Notas de teste' if random.random() > 0.5 else ''  
+
+        # Adicionar a transação ao banco de dados
         add_transaction(
             date=trans_date,
             type_=type_,
-            value=value,
-            category=category,
             description=description,
             payment_method=payment_method,
-            document_number=document_number,
-            responsible=responsible,
+            bank=bank,
+            value=value,
+            categories=categories,  # Associar categorias
             notes=notes
         )
-        print(f"Added transaction {i + 1}: {description}, {value}, {type_}")
+        print(f"Adicionada transação {i + 1}: {description}, {value}, {type_.value}, Categorias: {categories}")
 
-# Call the function to seed the data
+# Chamar a função para popular os dados
 if __name__ == '__main__':
     seed_data()
-    print("Database populated with 30 sample entries.")
+    print("Banco de dados populado com 30 entradas de exemplo.")

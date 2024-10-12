@@ -1,32 +1,43 @@
 import streamlit as st
-from database.db_handler import add_transaction  # Importa a função de adicionar transação
+from database.db_handler import add_transaction, get_all_categories, PaymentMethodEnum, BankEnum, TransactionTypeEnum
 from datetime import date
 
+# Renderização do formulário de inserção de despesas
 def render_form():
-    st.header("Inserir Despesa")
 
-    # Campos do formulário para despesas
-    data_despesa = st.date_input("Data da Despesa", value=date.today())
-    valor = st.number_input("Valor", min_value=0.0)
-    categoria = st.selectbox("Categoria", ["Materiais", "Serviços", "Manutenção", "Salário", "+Adicionar"])
-    fornecedor = st.text_input("Fornecedor (Pessoa/Empresa)")
-    forma_pagamento = st.selectbox("Forma de Pagamento", ["Transferência Bancária", "Crédito", "Boleto", "Dinheiro"])
-    numero_documento = st.text_input("Número do Documento/Recibo/Nota Fiscal")
-    periodicidade = st.radio("Periodicidade", ["Pontual", "Recorrente"])  # Esse campo pode ser adicionado ao banco se necessário
-    responsavel = st.text_input("Responsável")
-    observacoes = st.text_area("Observações (Opcional)")
+    with st.form(key='expense_form'):
 
-    # Inserção de despesa
-    if st.button("Inserir Despesa"):
-        add_transaction(
-            date=data_despesa,
-            type_="Despesa",
-            value=valor,
-            category=categoria,
-            description=fornecedor,  # Aqui, 'fornecedor' é tratado como descrição
-            payment_method=forma_pagamento,
-            document_number=numero_documento,
-            responsible=responsavel,
-            notes=observacoes
-        )
-        st.success("Despesa inserida com sucesso!")
+        col1, col2 = st.columns(2)
+        valor = col1.number_input("💵 Valor (R$)", min_value=0.0, format="%.2f")
+        data_despesa = col2.date_input("📅 Data da Despesa", value=date.today())
+        
+        descricao = st.text_input("📝 Destinatário", placeholder="Nome do destinatário ou descrição da despesa")
+        
+        categorias = st.multiselect("📂 Categorias", get_all_categories(), default=[])
+
+        col3, col4 = st.columns(2)
+        forma_pagamento = col3.selectbox("💳 Forma de Pagamento", [e.value for e in PaymentMethodEnum])
+        banco = col4.selectbox("🏦 Banco", [e.value for e in BankEnum])
+
+        observacoes = st.text_area("✏️ Observações (Opcional)", placeholder="Detalhes adicionais sobre a despesa")
+        
+        st.markdown("---")
+
+        # Botão para submeter o formulário
+        if st.form_submit_button("💾 Inserir Despesa"):
+            # Convertendo a lista de categorias para passar na transação
+            add_transaction(
+                date=data_despesa,
+                type_=TransactionTypeEnum.DEBITO.value,
+                description=descricao,
+                payment_method=forma_pagamento,
+                bank=banco,
+                value=valor,
+                categories=categorias,
+                notes=observacoes
+            )
+            st.success("✅ Despesa inserida com sucesso!")
+
+# Executando o formulário
+if __name__ == "__main__":
+    render_form()

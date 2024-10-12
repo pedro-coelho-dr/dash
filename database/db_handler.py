@@ -1,9 +1,10 @@
 import os
-from sqlalchemy import create_engine, Column, Integer, String, Float, Date, Text
+from sqlalchemy import create_engine, Column, Integer, String, Float, Date, Text, Enum, Table, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
+import enum
 
-# Definindo o diretório base e o caminho para o banco de dados
+# diretório base e caminho do banco de dados
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE_PATH = os.path.join(BASE_DIR, 'database.db')
 
@@ -12,39 +13,92 @@ engine = create_engine(f'sqlite:///{DATABASE_PATH}')
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Base para os modelos do SQLAlchemy
+# Base modelos do SQLAlchemy
 Base = declarative_base()
 
-# Modelo
+# Bancos
+class BankEnum(enum.Enum):
+    CRED_CREA = "Cred Crea"
+    INTER = "Inter"
+    CAIXA = "Caixa"
+
+# Tipo de Transação
+class TransactionTypeEnum(enum.Enum):
+    CREDITO = "Crédito"
+    DEBITO = "Débito"
+
+# Método de Pagamento
+class PaymentMethodEnum(enum.Enum): 
+    PIX = "Pix"
+    DEBITO = "Débito"
+    CREDITO = "Crédito"
+    DINHEIRO = "Dinheiro"
+    BOLETO = "Boleto"
+    TRANSFERENCIA = "Transferência"
+
+# Tabela de associação para relacionamento N:M
+transaction_category_association = Table(
+    'transaction_category', Base.metadata,
+    Column('transaction_id', Integer, ForeignKey('transactions.id')),
+    Column('category_id', Integer, ForeignKey('categories.id'))
+)
+
+# Modelo Category para armazenar categorias dinamicamente
+class Category(Base):
+    __tablename__ = 'categories'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True)
+
+# Modelo Transaction
 class Transaction(Base):
     __tablename__ = 'transactions'
-    id = Column(Integer, primary_key=True)  # Identificador da transação
+    id = Column(Integer, primary_key=True)  # Id
     date = Column(Date)  # Data da transação
-    type = Column(String)  # Tipo: Receita ou Despesa
-    description = Column(String)  # Descrição (ex.: origem ou fornecedor)
-    payment_method = Column(String)  # Forma de pagamento (ex.: Transferência, Crédito)
-    bank = Column(String)  # Banco (ex.: Banco do Brasil, Caixa)
+    type = Column(Enum(TransactionTypeEnum))  # Crédito ou Débito
+    description = Column(String)  # Nome da origem/destino da transação
+    payment_method = Column(Enum(PaymentMethodEnum))  # Forma de pagamento
+    bank = Column(Enum(BankEnum))  # Banco
     value = Column(Float)  # Valor da transação
-    category = Column(String)  # Categoria (ex.: Materiais, Serviços)
-    notes = Column(Text)  # Observações (opcional)
+    categories = relationship("Category", secondary=transaction_category_association)  # Relacionamento N:M
+    notes = Column(Text)  # Observações
 
 # Criação do banco de dados e das tabelas
 Base.metadata.create_all(engine)
 
 # Função para adicionar transações
-def add_transaction(date, type_, description, payment_method, bank, value, category, notes):
+def add_transaction(date, type_, description, payment_method, bank, value, categories, notes):
+    # Verificar e criar categorias, se necessário
+    category_objects = []
+    for category_name in categories:
+        category = session.query(Category).filter_by(name=category_name).first()
+        if not category:
+            category = Category(name=category_name)
+            session.add(category)
+        category_objects.append(category)
+
     new_transaction = Transaction(
         date=date,
-        type=type_,
+        type=type_, 
         description=description,
         payment_method=payment_method,
         bank=bank,
         value=value,
-        category=category,
+        categories=category_objects,  # Associar categorias
         notes=notes
     )
     session.add(new_transaction)
     session.commit()
+
+# Função para adicionar uma nova categoria
+def add_category(name):
+    if not session.query(Category).filter_by(name=name).first():
+        new_category = Category(name=name)
+        session.add(new_category)
+        session.commit()
+
+# Função para buscar todas as categorias
+def get_all_categories():
+    return [category.name for category in session.query(Category).all()]
 
 # Função para buscar todas as transações
 def get_all_transactions():

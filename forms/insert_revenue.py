@@ -1,31 +1,45 @@
 import streamlit as st
-from database.db_handler import add_transaction  # Importa a função de adicionar transação
+from database.db_handler import add_transaction, get_all_categories, PaymentMethodEnum, BankEnum, TransactionTypeEnum
 from datetime import date
 
+# Renderização do formulário de inserção de receitas
 def render_form():
-    st.header("Inserir Receita")
+    with st.form(key='revenue_form'):
 
-    # Campos do formulário para receitas
-    data_recebimento = st.date_input("Data de Recebimento", value=date.today())
-    valor = st.number_input("Valor", min_value=0.0)
-    origem = st.selectbox("Origem", ["Cliente", "Serviço Específico", "Venda de Produto", "Outro"])
-    forma_pagamento = st.selectbox("Forma de Pagamento", ["Transferência Bancária", "Crédito", "Boleto", "Dinheiro"])
-    numero_documento = st.text_input("Número do Documento/Recibo/Nota Fiscal")
-    categoria = st.selectbox("Categoria", ["Venda de Produto", "Prestação", "Outro"])
-    responsavel = st.text_input("Responsável")
-    observacoes = st.text_area("Observações (Opcional)")
+        col1, col2 = st.columns(2)
+        valor = col1.number_input("💵 Valor (R$)", min_value=0.0, format="%.2f")
+        data_receita = col2.date_input("📅 Data da Receita", value=date.today())
 
-    # Inserção de receita
-    if st.button("Inserir Receita"):
-        add_transaction(
-            date=data_recebimento,
-            type_="Receita",
-            value=valor,
-            category=categoria,
-            description=origem,  # Aqui, 'origem' é tratado como descrição
-            payment_method=forma_pagamento,
-            document_number=numero_documento,
-            responsible=responsavel,
-            notes=observacoes
-        )
-        st.success("Receita inserida com sucesso!")
+    
+        descricao = st.text_input("📝 Origem", placeholder="Nome da origem ou descrição da receita")
+
+        categorias = st.multiselect("📂 Categorias", get_all_categories(), default=[])
+
+        col3, col4 = st.columns(2)
+
+        forma_pagamento = col3.selectbox("💳 Forma de Pagamento", [e.value for e in PaymentMethodEnum])
+        banco = col4.selectbox("🏦 Banco", [e.value for e in BankEnum])
+
+        
+        observacoes = st.text_area("✏️ Observações (Opcional)", placeholder="Detalhes adicionais sobre a receita")
+        
+        # Separador visual
+        st.markdown("---")
+
+        # Botão para submeter o formulário
+        if st.form_submit_button("💾 Inserir Receita"):
+            add_transaction(
+                date=data_receita,
+                type_=TransactionTypeEnum.CREDITO.value,
+                description=descricao,
+                payment_method=forma_pagamento,
+                bank=banco,
+                value=valor,
+                categories=categorias,  # Passar a lista de categorias
+                notes=observacoes
+            )
+            st.success("✅ Receita inserida com sucesso!")
+
+# Executando o formulário
+if __name__ == "__main__":
+    render_form()
