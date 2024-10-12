@@ -30,4 +30,3 @@ def render_form():
             notes=observacoes
         )
         st.success("Despesa inserida com sucesso!")
-
