@@ -15,8 +15,8 @@ def render_form():
         categorias = st.multiselect("📂 Categorias", get_all_categories(), default=[])
 
         col3, col4 = st.columns(2)
-        forma_pagamento = col3.selectbox("💳 Forma de Pagamento", [e.name for e in PaymentMethodEnum])
-        banco = col4.selectbox("🏦 Banco", [e.name for e in BankEnum])
+        forma_pagamento = col3.selectbox("💳 Forma de Pagamento", [e.value for e in PaymentMethodEnum])
+        banco = col4.selectbox("🏦 Banco", [e.value for e in BankEnum])
 
         
         observacoes = st.text_area("✏️ Observações (Opcional)", placeholder="Detalhes adicionais sobre a receita")
@@ -26,12 +26,16 @@ def render_form():
 
         # Botão para submeter o formulário
         if st.form_submit_button("💾 Inserir Receita"):
+
+            payment_method_enum = next(e for e in PaymentMethodEnum if e.value == forma_pagamento)
+            bank_enum = next(e for e in BankEnum if e.value == banco)
+
             add_transaction(
                 date=data_receita,
                 type_=TransactionTypeEnum.CREDITO.name,
                 description=descricao,
-                payment_method=PaymentMethodEnum[forma_pagamento].name,
-                bank=BankEnum[banco].name,
+                payment_method=payment_method_enum.name,
+                bank=bank_enum.name,
                 value=valor,
                 categories=categorias,  # Passar a lista de categorias
                 notes=observacoes

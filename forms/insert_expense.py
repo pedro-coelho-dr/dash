@@ -25,13 +25,17 @@ def render_form():
 
         # Botão para submeter o formulário
         if st.form_submit_button("💾 Inserir Despesa"):
+
+            payment_method_enum = next(e for e in PaymentMethodEnum if e.value == forma_pagamento)
+            bank_enum = next(e for e in BankEnum if e.value == banco)
+            
             # Convertendo a lista de categorias para passar na transação
             add_transaction(
                 date=data_despesa,
                 type_=TransactionTypeEnum.DEBITO.name,
                 description=descricao,
-                payment_method=PaymentMethodEnum[forma_pagamento].name,
-                bank=BankEnum[banco].name,
+                payment_method=payment_method_enum.name,
+                bank=bank_enum.name,
                 value=valor,
                 categories=categorias,
                 notes=observacoes
