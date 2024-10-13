@@ -28,10 +28,10 @@ def render_form():
             # Convertendo a lista de categorias para passar na transação
             add_transaction(
                 date=data_despesa,
-                type_=TransactionTypeEnum.DEBITO.value,
+                type_=TransactionTypeEnum.DEBITO.name,
                 description=descricao,
-                payment_method=forma_pagamento,
-                bank=banco,
+                payment_method=PaymentMethodEnum[forma_pagamento].name,
+                bank=BankEnum[banco].name,
                 value=valor,
                 categories=categorias,
                 notes=observacoes

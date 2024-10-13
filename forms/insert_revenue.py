@@ -10,15 +10,13 @@ def render_form():
         valor = col1.number_input("💵 Valor (R$)", min_value=0.0, format="%.2f")
         data_receita = col2.date_input("📅 Data da Receita", value=date.today())
 
-    
         descricao = st.text_input("📝 Origem", placeholder="Nome da origem ou descrição da receita")
 
         categorias = st.multiselect("📂 Categorias", get_all_categories(), default=[])
 
         col3, col4 = st.columns(2)
-
-        forma_pagamento = col3.selectbox("💳 Forma de Pagamento", [e.value for e in PaymentMethodEnum])
-        banco = col4.selectbox("🏦 Banco", [e.value for e in BankEnum])
+        forma_pagamento = col3.selectbox("💳 Forma de Pagamento", [e.name for e in PaymentMethodEnum])
+        banco = col4.selectbox("🏦 Banco", [e.name for e in BankEnum])
 
         
         observacoes = st.text_area("✏️ Observações (Opcional)", placeholder="Detalhes adicionais sobre a receita")
@@ -30,10 +28,10 @@ def render_form():
         if st.form_submit_button("💾 Inserir Receita"):
             add_transaction(
                 date=data_receita,
-                type_=TransactionTypeEnum.CREDITO.value,
+                type_=TransactionTypeEnum.CREDITO.name,
                 description=descricao,
-                payment_method=forma_pagamento,
-                bank=banco,
+                payment_method=PaymentMethodEnum[forma_pagamento].name,
+                bank=BankEnum[banco].name,
                 value=valor,
                 categories=categorias,  # Passar a lista de categorias
                 notes=observacoes

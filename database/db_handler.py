@@ -54,10 +54,10 @@ class Transaction(Base):
     __tablename__ = 'transactions'
     id = Column(Integer, primary_key=True)  # Id
     date = Column(Date)  # Data da transação
-    type = Column(Enum(TransactionTypeEnum))  # Crédito ou Débito
+    type = Column(String)  # Crédito ou Débito
     description = Column(String)  # Nome da origem/destino da transação
-    payment_method = Column(Enum(PaymentMethodEnum))  # Forma de pagamento
-    bank = Column(Enum(BankEnum))  # Banco
+    payment_method = Column(String)  # Forma de pagamento
+    bank = Column(String)  # Banco
     value = Column(Float)  # Valor da transação
     categories = relationship("Category", secondary=transaction_category_association)  # Relacionamento N:M
     notes = Column(Text)  # Observações
