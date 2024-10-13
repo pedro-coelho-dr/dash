@@ -14,7 +14,7 @@ def overview():
             "Data": [t.date for t in transactions],
             "Descrição": [t.description for t in transactions],
             "Valor": [t.value for t in transactions],
-            "Tipo": ["Receita" if t.type == TransactionTypeEnum.CREDITO else "Despesa" for t in transactions],
+            "Tipo": ["Receita" if t.type == TransactionTypeEnum.CREDITO.name else "Despesa" for t in transactions],
             "Categorias": [", ".join([cat.name for cat in t.categories]) for t in transactions]  # Adiciona categorias
         }
         df_transactions = pd.DataFrame(transaction_data)

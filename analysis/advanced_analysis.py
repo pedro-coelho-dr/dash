@@ -10,7 +10,7 @@ def load_transactions():
     # Converter transações em um DataFrame
     data = {
         'date': [t.date for t in transactions],
-        'type': ["Receita" if t.type == TransactionTypeEnum.CREDITO else "Despesa" for t in transactions],
+        'type': ["Receita" if t.type == TransactionTypeEnum.CREDITO.name else "Despesa" for t in transactions],
         'value': [t.value for t in transactions],
         'categories': [", ".join([cat.name for cat in t.categories]) for t in transactions],
         'description': [t.description for t in transactions],
