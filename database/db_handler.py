@@ -13,7 +13,7 @@ engine = create_engine(f'sqlite:///{DATABASE_PATH}')
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Base modelos do SQLAlchemy
+# Base modelos do SQLAlchemy/ classe mae para fazer registros de outras classes modelos no banco
 Base = declarative_base()
 
 # Bancos
@@ -36,7 +36,7 @@ class PaymentMethodEnum(enum.Enum):
     BOLETO = "Boleto"
     TRANSFERENCIA = "Transferência"
 
-# Tabela de associação para relacionamento N:M
+# Tabela de associação para relacionamento N:N
 transaction_category_association = Table(
     'transaction_category', Base.metadata,
     Column('transaction_id', Integer, ForeignKey('transactions.id')),
@@ -59,14 +59,21 @@ class Transaction(Base):
     payment_method = Column(String)  # Forma de pagamento
     bank = Column(String)  # Banco
     value = Column(Float)  # Valor da transação
-    categories = relationship("Category", secondary=transaction_category_association)  # Relacionamento N:M
+    categories = relationship("Category", secondary=transaction_category_association)  # Lista de Category/ Relacionamento N:N
     notes = Column(Text)  # Observações
+
+    def __str__(self):
+        categories_str = ', '.join([category.name for category in self.categories])  # Converte categorias em string
+        return (f"Transaction(id={self.id}, date={self.date}, type={self.type}, "
+                f"description={self.description}, payment_method={self.payment_method}, "
+                f"bank={self.bank}, value={self.value}, categories=[{categories_str}], "
+                f"notes={self.notes})")
 
 # Criação do banco de dados e das tabelas
 Base.metadata.create_all(engine)
 
 # Função para adicionar transações
-def add_transaction(date, type_, description, payment_method, bank, value, categories, notes):
+def add_transaction(date, type_, description, payment_method, bank, value, categories, notes): # as categorias são uma lista de nomes
     # Verificar e criar categorias, se necessário
     category_objects = []
     for category_name in categories:

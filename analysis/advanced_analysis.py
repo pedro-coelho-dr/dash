@@ -10,7 +10,7 @@ def load_transactions():
     # Converter transações em um DataFrame
     data = {
         'date': [t.date for t in transactions],
-        'type': ["Receita" if t.type == TransactionTypeEnum.CREDITO else "Despesa" for t in transactions],
+        'type': ["Receita" if t.type == TransactionTypeEnum.CREDITO.name else "Despesa" for t in transactions],
         'value': [t.value for t in transactions],
         'categories': [", ".join([cat.name for cat in t.categories]) for t in transactions],
         'description': [t.description for t in transactions],
@@ -20,8 +20,14 @@ def load_transactions():
 
 # Função para gerar gráfico de barras
 def plot_bar_chart(df):
+    # Converter as strings de categorias em listas
+    df['categories'] = df['categories'].str.split(', ')
+
+    # "Explodir" a coluna de categorias para ter uma linha por categoria
+    df_exploded = df.explode('categories')
+    
     st.subheader("📊 Gráfico de Barras: Total por Categoria")
-    bar_data = df.groupby('categories')['value'].sum().sort_values(ascending=False)
+    bar_data = df_exploded.groupby('categories')['value'].sum().sort_values(ascending=False)
     st.bar_chart(bar_data)
 
 # Função para gerar gráfico de linhas

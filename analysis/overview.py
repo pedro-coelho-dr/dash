@@ -8,20 +8,41 @@ def overview():
     # Buscar transações do banco de dados
     transactions = get_all_transactions()
     
+    # Converter registros de transações para um DataFrame do Pandas
     if transactions:
-        # Converter registros de transações para um DataFrame do Pandas
+
         transaction_data = {
-            "Data": [t.date for t in transactions],
-            "Descrição": [t.description for t in transactions],
-            "Valor": [t.value for t in transactions],
-            "Tipo": ["Receita" if t.type == TransactionTypeEnum.CREDITO else "Despesa" for t in transactions],
-            "Categorias": [", ".join([cat.name for cat in t.categories]) for t in transactions]  # Adiciona categorias
+            "Data": [],
+            "Descrição": [],
+            "Valor": [],
+            "Tipo": [],
+            "Categorias": []  # categorias como strings ["cat1, cat2", "cat2", "cat1, cat3", ...]
         }
+        
+        # Armazenar todas as transações no dicionário por coluna
+        for t in transactions:
+            transaction_data["Data"].append(t.date)
+            transaction_data["Descrição"].append(t.description)
+            transaction_data["Valor"].append(t.value)
+            transaction_data["Tipo"].append("Receita" if t.type == TransactionTypeEnum.CREDITO.name else "Despesa")
+            transaction_data["Categorias"].append(", ".join([cat.name for cat in t.categories]))
+
+        # Criar DataFrame com dicionário
         df_transactions = pd.DataFrame(transaction_data)
+
+        # Normalizar dados
+        df_transactions = df_transactions.sort_values(by="Data", ascending=False)  # Ordena pela coluna 'Data'
 
         # Exibir DataFrame como uma tabela
         st.subheader("📋 Transações Recentes")
-        st.table(df_transactions)
+        show_all = st.checkbox("Mostrar Todas as Entradas", value=False)
+
+
+        # Exibe todas as transações em uma tabela scrollável
+        if show_all:
+            st.dataframe(df_transactions, use_container_width=True)  
+        else:
+            st.dataframe(df_transactions.head(30), use_container_width=True)  # Exibe apenas as primeiras 30 transações em uma tabela scrollável
 
         # Calcular total de receitas e despesas
         total_receitas = df_transactions[df_transactions["Tipo"] == "Receita"]["Valor"].sum()

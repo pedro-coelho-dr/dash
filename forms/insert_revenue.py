@@ -37,7 +37,7 @@ def render_form():
                 payment_method=payment_method_enum.name,
                 bank=bank_enum.name,
                 value=valor,
-                categories=categorias,  # Passar a lista de categorias
+                categories=categorias,  # Passar a lista de categorias em string
                 notes=observacoes
             )
             st.success("✅ Receita inserida com sucesso!")

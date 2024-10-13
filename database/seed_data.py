@@ -29,7 +29,7 @@ def seed_data():
         trans_date = start_date + timedelta(days=i)  # Incrementa cada transação em 1 dia
         
         # Escolher entre CREDITO e DEBITO (com os valores exatos do Enum)
-        type_ = random.choice([TransactionTypeEnum.CREDITO, TransactionTypeEnum.DEBITO])  
+        type_ = random.choice(list(TransactionTypeEnum))  
         
         # Valor entre 100 e 2000
         value = round(random.uniform(100, 2000), 2)  
@@ -52,10 +52,10 @@ def seed_data():
         # Adicionar a transação ao banco de dados
         add_transaction(
             date=trans_date,
-            type_=type_,
+            type_=type_.name,
             description=description,
-            payment_method=payment_method,
-            bank=bank,
+            payment_method=payment_method.name,
+            bank=bank.name,
             value=value,
             categories=categories,  # Associar categorias
             notes=notes
