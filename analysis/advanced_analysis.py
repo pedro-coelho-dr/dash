@@ -1,52 +1,51 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database.db_handler import get_all_transactions, TransactionTypeEnum
+from database.db_handler import get_Transactions_Dataframe, TransactionTypeEnum
 
-# Função para carregar transações e convertê-las em um DataFrame do pandas
-def load_transactions():
-    transactions = get_all_transactions()
 
-    # Converter transações em um DataFrame
-    data = {
-        'date': [t.date for t in transactions],
-        'type': ["Receita" if t.type == TransactionTypeEnum.CREDITO.name else "Despesa" for t in transactions],
-        'value': [t.value for t in transactions],
-        'categories': [", ".join([cat.name for cat in t.categories]) for t in transactions],
-        'description': [t.description for t in transactions],
-    }
+# Função para gerar gráfico de barras sobrepostas
+def plot_overlapped_bar_chart(df):
+    df_copy = df.copy()
 
-    return pd.DataFrame(data)
-
-# Função para gerar gráfico de barras
-def plot_bar_chart(df):
     # Converter as strings de categorias em listas
-    df['categories'] = df['categories'].str.split(', ')
+    df_copy['Categorias'] = df_copy['Categorias'].str.split(', ')
 
     # "Explodir" a coluna de categorias para ter uma linha por categoria
-    df_exploded = df.explode('categories')
+    df_exploded = df_copy.explode('Categorias')
+
+    # Agrupar por categoria e tipo (Receita/Despesa) para obter o total por tipo dentro de cada categoria
+    bar_data = df_exploded.groupby(['Categorias', 'Tipo'])['Valor'].sum().reset_index()
+
+    # Criar gráfico de barras sobrepostas
+    st.subheader("📊 Gráfico de Barras Sobrepostas: Receita e Despesa por Categoria")
+    fig = px.bar(bar_data, x='Categorias', y='Valor', color='Tipo', barmode='group',
+                 labels={'Valor': 'Valor (R$)', 'Categorias': 'Categorias'},
+                 title='Receita e Despesa por Categoria (Comparação lado a lado)',
+                 color_discrete_map={"Receita": "#09AB3B", "Despesa": "#FF2B2B"})  # Especificar as cores
     
-    st.subheader("📊 Gráfico de Barras: Total por Categoria")
-    bar_data = df_exploded.groupby('categories')['value'].sum().sort_values(ascending=False)
-    st.bar_chart(bar_data)
+    st.plotly_chart(fig)
+
 
 # Função para gerar gráfico de linhas
 def plot_line_chart(df):
+    df_copy = df.copy()
     st.subheader("📈 Gráfico de Linhas: Valor ao Longo do Tempo")
-    df_sorted = df.sort_values(by='date')
-    st.line_chart(df_sorted.set_index('date')['value'])
+    st.line_chart(df_copy.set_index('Data')['Valor'])  # Usar Data e Valor
 
 # Função para gerar gráfico de área
 def plot_area_chart(df):
+    df_copy = df.copy()
+
     st.subheader("📊 Gráfico de Área: Valor Acumulado ao Longo do Tempo")
-    df_sorted = df.sort_values(by='date')
-    df_sorted['cumulative_value'] = df_sorted['value'].cumsum()
-    st.area_chart(df_sorted.set_index('date')['cumulative_value'])
+    df_copy['Valor Acumulado'] = df_copy['Valor'].cumsum()  # Calcular valor acumulado
+    st.area_chart(df_copy.set_index('Data')['Valor Acumulado'])  # Usar Data e Valor Acumulado
 
 # Função para gerar gráfico de dispersão
 def plot_scatter_chart(df):
+    df_copy = df.copy()
     st.subheader("🔍 Gráfico de Dispersão: Valor por Categoria")
-    fig = px.scatter(df, x='categories', y='value', color='type', size='value',
+    fig = px.scatter(df_copy, x='Categorias', y='Valor', color='Tipo', size='Valor',
                      title='Valor da Transação por Categoria')
     st.plotly_chart(fig)
 
@@ -55,11 +54,11 @@ def advanced_analysis():
     st.title("📊 Análise Avançada - Comparação de Categorias")
 
     # Carregar transações do banco de dados
-    df = load_transactions()
+    df = get_Transactions_Dataframe()
 
     if not df.empty:
         # Exibir diferentes gráficos
-        plot_bar_chart(df)
+        plot_overlapped_bar_chart(df)
         plot_line_chart(df)
         plot_area_chart(df)
         plot_scatter_chart(df)

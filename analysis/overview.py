@@ -1,42 +1,22 @@
 import streamlit as st
 import pandas as pd
-from database.db_handler import get_all_transactions, TransactionTypeEnum
+import plotly.express as px
+from database.db_handler import get_Transactions_Dataframe
+
+
 
 def overview():
     st.title("💸 Visão Geral do Fluxo de Caixa")
-    
-    # Buscar transações do banco de dados
-    transactions = get_all_transactions()
-    
-    # Converter registros de transações para um DataFrame do Pandas
-    if transactions:
 
-        transaction_data = {
-            "Data": [],
-            "Descrição": [],
-            "Valor": [],
-            "Tipo": [],
-            "Categorias": []  # categorias como strings ["cat1, cat2", "cat2", "cat1, cat3", ...]
-        }
-        
-        # Armazenar todas as transações no dicionário por coluna
-        for t in transactions:
-            transaction_data["Data"].append(t.date)
-            transaction_data["Descrição"].append(t.description)
-            transaction_data["Valor"].append(t.value)
-            transaction_data["Tipo"].append("Receita" if t.type == TransactionTypeEnum.CREDITO.name else "Despesa")
-            transaction_data["Categorias"].append(", ".join([cat.name for cat in t.categories]))
+    df_transactions = get_Transactions_Dataframe()
 
-        # Criar DataFrame com dicionário
-        df_transactions = pd.DataFrame(transaction_data)
-
+    if not df_transactions.empty:
         # Normalizar dados
         df_transactions = df_transactions.sort_values(by="Data", ascending=False)  # Ordena pela coluna 'Data'
 
         # Exibir DataFrame como uma tabela
         st.subheader("📋 Transações Recentes")
         show_all = st.checkbox("Mostrar Todas as Entradas", value=False)
-
 
         # Exibe todas as transações em uma tabela scrollável
         if show_all:
@@ -52,16 +32,21 @@ def overview():
         # Exibir KPIs com ícones e cores
         col1, col2, col3 = st.columns(3)
         col1.metric("💰 Total de Receitas", f"R$ {total_receitas:,.2f}", delta=f"+R$ {total_receitas:,.2f}", delta_color="normal")
-        col2.metric("💸 Total de Despesas", f"R$ {total_despesas:,.2f}", delta=f"-R$ {total_despesas:,.2f}", delta_color="inverse")
+        col2.metric("💸 Total de Despesas", f"R$ {total_despesas:,.2f}", delta=f"-R$ {total_despesas:,.2f}", delta_color="normal")
         col3.metric("🧾 Saldo Líquido", f"R$ {saldo_liquido:,.2f}")
 
-        # Exibir gráfico de barras com receitas e despesas
-        st.subheader("📊 Gráfico de Receitas e Despesas")
-        df_summary = pd.DataFrame({
-            "Tipo": ["Receita", "Despesa"],
-            "Valor": [total_receitas, total_despesas]
-        })
-        st.bar_chart(df_summary.set_index("Tipo"))
+        # Exibir gráfico de barras interativo com receitas e despesas ao longo do tempo
+        st.subheader("📊 Gráfico Interativo de Receitas e Despesas")
+        df_summary = df_transactions.groupby(['Data', 'Tipo']).sum().reset_index()  # Agrupar por Data e Tipo
+
+        # Criar gráfico de barras
+        fig = px.bar(df_summary, x='Data', y='Valor', color='Tipo', barmode='group',
+                     title='Receitas e Despesas ao Longo do Tempo',
+                     labels={'Valor': 'Valor (R$)', 'Data': 'Data'},
+                     template='plotly_white',
+                     color_discrete_map={"Receita": "#09AB3B", "Despesa": "#FF2B2B"})  # Especificar as cores
+
+        st.plotly_chart(fig)
 
     else:
         st.write("Nenhuma transação encontrada.")
