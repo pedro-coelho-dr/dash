@@ -32,7 +32,7 @@ def render_form():
             # Convertendo a lista de categorias para passar na transação
             new_transaction = Transaction(
                 date=data_despesa,
-                type_=TransactionTypeEnum.DEBITO.name,
+                type=TransactionTypeEnum.DEBITO.name,
                 description=descricao,
                 payment_method=payment_method_enum.name,
                 bank=bank_enum.name,

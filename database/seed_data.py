@@ -10,6 +10,8 @@ df = pd.read_csv(csv_file_path, sep=',', header=0)
 
 # Check if the 'date' column contains valid date values
 df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d', errors='coerce')  # 'coerce' will turn invalid dates into NaT (missing dates)
+print("=====================")
+print(df.head())
 
 # Print out the rows where dates are NaT to debug
 print("Rows with invalid or missing dates:")

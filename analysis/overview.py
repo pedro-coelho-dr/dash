@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database.db_handler import Transaction, get_Transactions_Dataframe, update_transaction
+from database.db_handler import Transaction, get_Transactions_Dataframe, get_transaction
+from forms.edit_register import render_formulario_edicao
 
 
 def overview():
@@ -61,30 +62,7 @@ def overview():
         st.write(f"**Tipo:** {selected_transaction['Tipo']}")
         st.write(f"**Categorias:** {selected_transaction['Categorias']}")
 
-        # Formulário para editar a transação
-        with st.form(key='edit_form'):
-            new_date = d
-            new_description = st.text_input("Descrição", value=selected_transaction['Descrição'])
-            new_value = st.number_input("Valor", value=selected_transaction['Valor'])
-            new_type = st.selectbox("Tipo", options=["Receita", "Despesa"], index=["Receita", "Despesa"].index(selected_transaction['Tipo']))
-            new_categories = st.text_input("Categorias (separadas por vírgula)", value=selected_transaction['Categorias'])
-
-            Transaction()
-
-            # Botão para salvar alterações
-            submitted = st.form_submit_button("Salvar Alterações")
-
-            if submitted:
-                # Atualizar a transação no DataFrame (ou no banco de dados)
-                df_transactions.at[transaction_id, 'Descrição'] = new_description
-                df_transactions.at[transaction_id, 'Valor'] = new_value
-                df_transactions.at[transaction_id, 'Tipo'] = new_type
-                df_transactions.at[transaction_id, 'Categorias'] = new_categories
-
-                # Chame a função para atualizar no banco de dados (exemplo)
-                update_transaction(transaction_id, new_description, new_value, new_type, new_categories)
-
-                st.success("Transação atualizada com sucesso!")
+        render_formulario_edicao(get_transaction(transaction_id))
 
     else:
         st.write("Nenhuma transação encontrada.")

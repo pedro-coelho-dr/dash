@@ -69,7 +69,7 @@ class Transaction(Base):
 
 
         # caso categorias seja uma lista de strings
-        if isinstance(categories, list) or all(isinstance(cat, str) for cat in categories):
+        if isinstance(categories, list) and all(isinstance(cat, str) for cat in categories):
             # Verificar e criar categorias, se necessário
             category_objects = []
             for category_name in categories:
