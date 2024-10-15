@@ -1,68 +1,56 @@
-from db_handler import add_transaction, clear_transactions, add_category, get_all_categories
-from datetime import date, timedelta
-import random
-from db_handler import PaymentMethodEnum, TransactionTypeEnum, BankEnum
+import os
+import pandas as pd
+from db_handler import add_transaction, add_category, get_all_categories
 
-# Função para popular o banco de dados com 30 entradas de exemplo
-def seed_data():
-    # Limpar o banco de dados antes de popular
-    clear_transactions()
+# Define the CSV file path
+csv_file_path = os.path.join(os.path.dirname(__file__), 'seed.csv')
 
-    # Definir algumas categorias iniciais
-    predefined_categories = ['Venda de Produto', 'Serviço', 'Materiais', 'Salário', 'Manutenção']
+# Read the CSV file, ensuring proper column parsing and separator handling
+df = pd.read_csv(csv_file_path, sep=',', header=0)
 
-    # Adicionar as categorias no banco de dados
-    for category in predefined_categories:
-        add_category(category)
+# Check if the 'date' column contains valid date values
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d', errors='coerce')  # 'coerce' will turn invalid dates into NaT (missing dates)
 
-    # Buscar todas as categorias disponíveis no banco de dados
-    available_categories = get_all_categories()
+# Print out the rows where dates are NaT to debug
+print("Rows with invalid or missing dates:")
+print(df[df['date'].isna()])
 
-    # Definir algumas descrições para as transações
-    descriptions = ['Venda A', 'Conserto', 'Compra Material', 'Salário Mensal', 'ReAparo Máquina']
+# Seed script to insert categories and transactions from CSV file
+def seed_database_from_csv():
+    # Check if categories already exist in the database
+    existing_categories = set(get_all_categories())
 
-    # Gerar 30 transações de exemplo
-    start_date = date(2024, 9, 1)  # Data de início das transações
-
-    for i in range(30):
-        # Gerar dados aleatórios para a transação
-        trans_date = start_date + timedelta(days=i)  # Incrementa cada transação em 1 dia
+    # Loop over each row in the DataFrame to add the transaction
+    for index, row in df.iterrows():
+        # Handle categories for each transaction (splitting on commas)
+        categories = row['categories'].split(', ') if pd.notna(row['categories']) else []
         
-        # Escolher entre CREDITO e DEBITO (com os valores exatos do Enum)
-        type_ = random.choice(list(TransactionTypeEnum))  
-        
-        # Valor entre 100 e 2000
-        value = round(random.uniform(100, 2000), 2)  
+        # Add new categories if not already in the database
+        for category in categories:
+            if category not in existing_categories:
+                add_category(category)
+                existing_categories.add(category)
 
-        # Descrição aleatória
-        description = random.choice(descriptions)
+        # Debug output for each transaction
+        print(f"Processing transaction {index+1}: Date = {row['date']}, Type = {row['type']}, Description = {row['description']}")
         
-        # Selecionar um método de pagamento do enum PaymentMethodEnum
-        payment_method = random.choice(list(PaymentMethodEnum))  # Usar os valores exatos do Enum
-        
-        # Selecionar um banco do enum BankEnum
-        bank = random.choice(list(BankEnum))  # Usar os valores exatos do Enum
-        
-        # Escolher 1 a 3 categorias aleatórias
-        categories = random.sample(available_categories, random.randint(1, 3))
-        
-        # Aleatoriamente adicionar notas
-        notes = 'Notas de teste' if random.random() > 0.5 else ''  
+        # Add the transaction if the date is valid
+        if pd.notna(row['date']):
+            add_transaction(
+                date=row['date'],
+                type_=row['type'],  # Crédito or Débito
+                description=row['description'],
+                payment_method=row['payment_method'],
+                bank=row['bank'],
+                value=row['value'],
+                categories=categories,
+                notes=row['notes'] if pd.notna(row['notes']) else ''
+            )
+        else:
+            print(f"Skipping transaction {index+1} due to invalid date.")
 
-        # Adicionar a transação ao banco de dados
-        add_transaction(
-            date=trans_date,
-            type_=type_.name,
-            description=description,
-            payment_method=payment_method.name,
-            bank=bank.name,
-            value=value,
-            categories=categories,  # Associar categorias
-            notes=notes
-        )
-        print(f"Adicionada transação {i + 1}: {description}, {value}, {type_.value}, Categorias: {categories}")
+    print("Database successfully seeded with transactions from CSV.")
 
-# Chamar a função para popular os dados
-if __name__ == '__main__':
-    seed_data()
-    print("Banco de dados populado com 30 entradas de exemplo.")
+# Run the seed function
+if __name__ == "__main__":
+    seed_database_from_csv()
