@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database.db_handler import get_Transactions_Dataframe, update_transaction
+from database.db_handler import Transaction, get_Transactions_Dataframe, update_transaction
 
 
 def overview():
@@ -63,10 +63,13 @@ def overview():
 
         # Formulário para editar a transação
         with st.form(key='edit_form'):
+            new_date = d
             new_description = st.text_input("Descrição", value=selected_transaction['Descrição'])
             new_value = st.number_input("Valor", value=selected_transaction['Valor'])
             new_type = st.selectbox("Tipo", options=["Receita", "Despesa"], index=["Receita", "Despesa"].index(selected_transaction['Tipo']))
             new_categories = st.text_input("Categorias (separadas por vírgula)", value=selected_transaction['Categorias'])
+
+            Transaction()
 
             # Botão para salvar alterações
             submitted = st.form_submit_button("Salvar Alterações")
