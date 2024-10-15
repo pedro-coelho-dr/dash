@@ -63,6 +63,37 @@ class Transaction(Base):
     categories = relationship("Category", secondary=transaction_category_association)  # Lista de Category/ Relacionamento N:N
     notes = Column(Text)  # Observações
 
+    def __init__(self, date:Date, type:String, description:String, payment_method:String, bank:String, value:Float, categories:list[Category], notes:Text):
+        # Chama o construtor da classe Base (declarative_base) para garantir a compatibilidade com o SQLAlchemy
+        super(Transaction, self).__init__()
+
+
+        # caso categorias seja uma lista de strings
+        if isinstance(categories, list) or all(isinstance(cat, str) for cat in categories):
+            # Verificar e criar categorias, se necessário
+            category_objects = []
+            for category_name in categories:
+                category = session.query(Category).filter_by(name=category_name).first()
+
+                if not category:
+                    category = Category(name=category_name)
+                    session.add(category)
+
+                category_objects.append(category)
+            
+            categories = category_objects
+        
+
+        # Defina os atributos
+        self.date = date
+        self.type = type
+        self.description = description
+        self.payment_method = payment_method
+        self.bank = bank
+        self.value = value
+        self.categories = categories
+        self.notes = notes
+
     def __str__(self):
         categories_str = ', '.join([category.name for category in self.categories])  # Converte categorias em string
         return (f"Transaction(id={self.id}, date={self.date}, type={self.type}, "
@@ -70,8 +101,56 @@ class Transaction(Base):
                 f"bank={self.bank}, value={self.value}, categories=[{categories_str}], "
                 f"notes={self.notes})")
 
+
+
 # Criação do banco de dados e das tabelas
 Base.metadata.create_all(engine)
+
+#====CRUD====
+
+# Função para salvar transações
+def save_transaction(transaction):
+    try:
+        session.add(transaction)
+        session.commit()
+    except Exception as e:
+        session.rollback()  # Desfaz qualquer mudança em caso de erro
+        raise ValueError(f"Error saving transaction: {e}")
+
+# Função para obter uma transação pelo ID
+def get_transaction(id):
+    try:
+        transaction = session.query(Transaction).filter_by(id=id).first()
+        if transaction is None:
+            raise ValueError(f"Transaction with id {id} not found.")
+        
+        return transaction
+    
+    except Exception as e:
+        raise ValueError(f"Error retrieving transaction: {e}")
+
+# Função para editar transações
+def update_transaction(transaction):
+    try:
+        persisted_transaction = get_transaction(transaction.id)
+        
+        # Modifica os atributos da transação
+        persisted_transaction.date = transaction.date
+        persisted_transaction.type = transaction.type
+        persisted_transaction.description = transaction.description
+        persisted_transaction.payment_method = transaction.payment_method
+        persisted_transaction.bank = transaction.bank
+        persisted_transaction.value = transaction.value
+        persisted_transaction.categories = transaction.categories
+        persisted_transaction.notes = transaction.notes
+        
+        # As alterações feitas em 'persisted_transaction' são automaticamente detectadas
+        session.commit()  # As mudanças são persistidas no banco de dados
+
+    except Exception as e:
+        session.rollback()  # Desfaz qualquer mudança em caso de erro
+        raise ValueError(f"Error editing transaction: {e}") # Re-raise se a transação não for encontrada
+
 
 # Função para adicionar transações
 def add_transaction(date, type_, description, payment_method, bank, value, categories, notes): # as categorias são uma lista de nomes
