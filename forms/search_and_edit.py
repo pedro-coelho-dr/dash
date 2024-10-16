@@ -3,7 +3,48 @@ from utils.filter_df_date import filter_df_date
 from database.db_handler import get_Transactions_Dataframe, get_transaction, delete_transaction
 from forms.edit_register import render_formulario_edicao
 
-# Function to search, display, edit, and delete transactions
+
+def render_transactions_as_cards(df):
+    for index, row in df.iterrows():
+        with st.container():
+            # Create columns 
+            col1, col2, col3, col4 = st.columns([1, 2, 1, 1])
+
+            # Display the ID and date in the first column
+            col1.markdown(f"**ID:** {row['ID']}")
+            col1.markdown(f"**Data:** {row['Data'].strftime('%d/%m/%Y')}")
+
+            # Display the description and type in the second column
+            col2.markdown(f"**Descrição:** {row['Descrição']}")
+            col2.markdown(f"**Tipo:** {row['Tipo']}")
+            col2.markdown(f"**Valor:** R$ {row['Valor']:.2f}")
+
+            # Display categories in the third column
+            col3.markdown(f"**Categorias:** {row['Categorias']}")
+
+            # Add buttons for Edit and Delete in the fourth column
+            edit_button = col4.button("✏️ Editar", key=f"edit_{row['ID']}")
+            delete_button = col4.button("🗑️ Excluir", key=f"delete_{row['ID']}")
+
+            st.markdown("---")
+
+            if edit_button:
+                selected_transaction = get_transaction(row['ID'])
+
+                render_formulario_edicao(selected_transaction)
+
+            if delete_button:
+                try:
+                    delete_transaction(row['ID'])
+                    st.success(f"✅ Transação ID {row['ID']} excluída com sucesso!")
+                except Exception as e:
+                    st.error(f"❌ Não foi possível excluir a transação: {e}")
+
+
+def search_all_columns(df, search_term):
+    return df[df.apply(lambda row: row.astype(str).str.contains(search_term, case=False, na=False).any(), axis=1)]
+
+# search, display, edit, and delete
 def search_and_edit_transactions():
     df_transactions = get_Transactions_Dataframe()
 
@@ -12,43 +53,29 @@ def search_and_edit_transactions():
     else:
         # Use the filter_df_date function to filter by date
         df_filtered = filter_df_date(df_transactions)
-
-        # Search bar to filter by description
-        search_term = st.text_input("Pesquisar por descrição:")
+        st.subheader("🔍 Pesquisar")
+        # Search bar to filter across all columns
+        search_term = st.text_input("Pesquisar por termo")
 
         if search_term:
-            df_filtered = df_filtered[df_filtered['Descrição'].str.contains(search_term, case=False, na=False)]
+            df_filtered = search_all_columns(df_filtered, search_term)
+
+        # Filter by transaction type (CREDITO or DEBITO)
+        tipo_transacao = st.radio("Filtrar por Tipo de Transação", options=["Todas", "Receita (Crédito)", "Despesa (Débito)"])
+
+        if tipo_transacao == "Receita (Crédito)":
+            df_filtered = df_filtered[df_filtered['Tipo'] == "Receita"]
+        elif tipo_transacao == "Despesa (Débito)":
+            df_filtered = df_filtered[df_filtered['Tipo'] == "Despesa"]
 
         if df_filtered.empty:
             st.write("Nenhuma transação encontrada.")
         else:
-            # Automatically render the filtered transactions in a table
-            st.write(f"Encontradas {len(df_filtered)} transações:")
-            st.dataframe(df_filtered, use_container_width=True)
+            # Inform how many transactions were found
+            st.write(f"**{len(df_filtered)}** transações encontradas:")
 
-            # Let the user select a transaction to edit or delete
-            transaction_id = st.selectbox("Selecione a Transação para Editar ou Excluir:", df_filtered.index)
-            selected_transaction = df_filtered.loc[transaction_id]
-
-            # Display and edit the selected transaction
-            st.write("### Detalhes da Transação")
-            st.write(f"**Data:** {selected_transaction['Data']}")
-            st.write(f"**Descrição:** {selected_transaction['Descrição']}")
-            st.write(f"**Valor:** R$ {selected_transaction['Valor']}")
-            st.write(f"**Tipo:** {selected_transaction['Tipo']}")
-            st.write(f"**Categorias:** {selected_transaction['Categorias']}")
-
-            # Render the form for editing
-            render_formulario_edicao(get_transaction(transaction_id))
-
-            # Button to delete the transaction
-            if st.button("🗑️ Excluir Transação"):
-                try:
-                    delete_transaction(transaction_id)
-                    st.success("✅ Transação excluída com sucesso!")
-                    st.experimental_rerun()  # Reload the page after deletion
-                except Exception as e:
-                    st.error(f"❌ Não foi possível excluir a transação: {e}")
+            # Render transactions as cards with Edit and Delete buttons
+            render_transactions_as_cards(df_filtered)
 
 # Running the search and edit functionality
 if __name__ == "__main__":
