@@ -6,7 +6,7 @@ from database.db_handler import get_Transactions_Dataframe, get_transaction
 from forms.edit_register import render_formulario_edicao
 
 def overview():
-    st.title("💸 Visão Geral do Fluxo de Caixa")
+    st.title("💸 Visão Geral")
 
     # Carregar as transações do banco de dados
     df_transactions = get_Transactions_Dataframe()
