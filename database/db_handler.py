@@ -230,6 +230,9 @@ def get_Transactions_Dataframe():
 
     # Criar DataFrame com dicionário
     df_transactions = pd.DataFrame(transaction_data)
+    # Normalizar dados
+    df_transactions['Data'] = pd.to_datetime(df_transactions['Data'])  # Certificar que 'Data' está no formato datetime
+    
     return df_transactions
 
 # Função para deletar uma transação pelo ID

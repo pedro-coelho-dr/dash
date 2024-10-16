@@ -2,6 +2,7 @@ from datetime import timedelta
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from utils.balance_histogram import balance_histogram
 from database.db_handler import get_Transactions_Dataframe, get_transaction
 from forms.edit_register import render_formulario_edicao
 from utils.filter_df_date import filter_df_date
@@ -34,6 +35,10 @@ def overview():
 
         df_summary = df_filtered.groupby(['Data', 'Tipo']).sum().reset_index()
         
+
+        balance_histogram(df_summary)
+
+
         # # Gráfico de barras
         # fig = px.bar(df_summary, x='Data', y='Valor', color='Tipo', barmode='group',
         #              title='Receitas e Despesas ao Longo do Tempo',
