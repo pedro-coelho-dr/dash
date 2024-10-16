@@ -10,7 +10,7 @@ def render_transaction_page():
     # Buttons to switch between different transaction options
     selected_form = st.radio(
         "Escolha o tipo de ação:", 
-        ('Inserir Receita', 'Inserir Despesa', 'Buscar, Editar ou Excluir'),
+        ('Gerenciar Transações', 'Inserir Receita', 'Inserir Despesa'),
         index=0
     )
 
@@ -23,8 +23,8 @@ def render_transaction_page():
         st.header("💸 Inserir Despesa")
         render_expense_form()
 
-    elif selected_form == 'Buscar, Editar ou Excluir':
-        st.header("🔍 Buscar, Editar ou Excluir Transações")
+    elif selected_form == 'Gerenciar Transações':
+        st.header("🔍 Gerenciar Transações")
         search_and_edit_transactions()
 
 # Executing the transaction page

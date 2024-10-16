@@ -38,9 +38,10 @@ def render_transactions_as_cards(df):
                 # Exibe uma mensagem de confirmação
                 st.warning(f"Tem certeza que deseja deletar a transação ID {row['ID']}?")
                 
+                col1, col2 = st.columns(2)
                 # Botão de confirmação final
-                confirm_delete = st.button('Sim, deletar', key=f"confirm_delete_{row['ID']}")
-                cancel_delete = st.button('Cancelar', key=f"cancel_delete_{row['ID']}")
+                confirm_delete = col1.button('Sim, deletar ✅', key=f"confirm_delete_{row['ID']}")
+                cancel_delete = col2.button('Cancelar ❌', key=f"cancel_delete_{row['ID']}")
 
                 if confirm_delete:
                     try:
