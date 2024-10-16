@@ -1,0 +1,7 @@
+[theme]
+base="dark"  # Inherit from the dark theme as the base
+primaryColor="#AED6F1"  # Soft blue, like a clear sky breaking through clouds
+backgroundColor="#0B0E11"  # Very dark, stormy cloud color
+secondaryBackgroundColor="#1C1F26"  # Slightly lighter gray, representing shadowed clouds
+textColor="#E0E0E0"  # Light gray text for good contrast and readability
+font="sans serif"  # Keep the font modern and clean for a minimal cloud aesthetic
