@@ -1,9 +1,9 @@
+from datetime import timedelta
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database.db_handler import Transaction, get_Transactions_Dataframe, get_transaction
+from database.db_handler import get_Transactions_Dataframe, get_transaction
 from forms.edit_register import render_formulario_edicao
-
 
 def overview():
     st.title("💸 Visão Geral do Fluxo de Caixa")
@@ -13,56 +13,102 @@ def overview():
 
     if not df_transactions.empty:
         # Normalizar dados
+        df_transactions['Data'] = pd.to_datetime(df_transactions['Data'])  # Certificar que 'Data' está no formato datetime
         df_transactions = df_transactions.sort_values(by="Data", ascending=False)  # Ordena pela coluna 'Data'
 
-        # Exibir DataFrame como uma tabela
-        st.subheader("📋 Transações Recentes")
-        show_all = st.checkbox("Mostrar Todas as Entradas", value=False)
+        # Filtrar periodo de analise
+        st.subheader("📅 Filtrar por Período")
+        # Checkbox para ativar filtro customizado
+        if st.checkbox("Usar filtro personalizado de período"):
+            # Seção de filtro por período
+            col1, col2 = st.columns(2)
+            start_date = col1.date_input("Data de Início", df_transactions['Data'].max().date() - timedelta(days=30))
+            end_date = col2.date_input("Data de Fim", df_transactions['Data'].max().date())
 
-        # Exibe todas as transações em uma tabela scrollável
-        if show_all:
-            st.dataframe(df_transactions, use_container_width=True)  
+            # Filtrar o DataFrame pelas datas selecionadas
+            df_filtered = df_transactions[(df_transactions['Data'] >= pd.to_datetime(start_date)) & 
+                                        (df_transactions['Data'] <= pd.to_datetime(end_date))]
         else:
-            st.dataframe(df_transactions.head(30), use_container_width=True)  # Exibe apenas as primeiras 30 transações
+
+            # Adicionar colunas de ano e mês para facilitar o filtro
+            df_transactions['Ano'] = df_transactions['Data'].dt.year
+            df_transactions['Mês'] = df_transactions['Data'].dt.month
+
+            # Filtro por ano e mês
+            col1, col2 = st.columns(2)
+           # Obter o último ano e mês a partir dos dados
+            last_year = df_transactions['Ano'].max()
+            last_month = df_transactions[df_transactions['Ano'] == last_year]['Mês'].max()
+
+            # Seleção do ano com o último ano como padrão
+            selected_year = col1.selectbox("Selecione o Ano", 
+                                        options=sorted(df_transactions['Ano'].unique(), reverse=True),
+                                        index=sorted(df_transactions['Ano'].unique(), reverse=True).index(last_year))
+
+            # Seleção do mês com o último mês como padrão
+            selected_month = col2.selectbox("Selecione o Mês", 
+                                            options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+                                            format_func=lambda x: pd.to_datetime(f'2024-{x:02d}-01').strftime('%B'),
+                                            index=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].index(last_month))
+
+            # Filtrar o DataFrame com base no mês e ano selecionados
+            df_filtered = df_transactions[(df_transactions['Ano'] == selected_year) & (df_transactions['Mês'] == selected_month)]
+
+
 
         # Calcular total de receitas e despesas
-        total_receitas = df_transactions[df_transactions["Tipo"] == "Receita"]["Valor"].sum()
-        total_despesas = df_transactions[df_transactions["Tipo"] == "Despesa"]["Valor"].sum()
+        total_receitas = df_filtered[df_filtered["Tipo"] == "Receita"]["Valor"].sum()
+        total_despesas = df_filtered[df_filtered["Tipo"] == "Despesa"]["Valor"].sum()
         saldo_liquido = total_receitas - total_despesas
 
-        # Exibir KPIs com ícones e cores
+        # Mostrar Métricas
         col1, col2, col3 = st.columns(3)
         col1.metric("💰 Total de Receitas", f"R$ {total_receitas:,.2f}", delta=f"+R$ {total_receitas:,.2f}", delta_color="normal")
         col2.metric("💸 Total de Despesas", f"R$ {total_despesas:,.2f}", delta=f"-R$ {total_despesas:,.2f}", delta_color="normal")
         col3.metric("🧾 Saldo Líquido", f"R$ {saldo_liquido:,.2f}")
 
-        # Exibir gráfico de barras interativo com receitas e despesas ao longo do tempo
-        st.subheader("📊 Gráfico Interativo de Receitas e Despesas")
-        df_summary = df_transactions.groupby(['Data', 'Tipo']).sum().reset_index()  # Agrupar por Data e Tipo
+        df_summary = df_filtered.groupby(['Data', 'Tipo']).sum().reset_index()
+        
+        # # Gráfico de barras
+        # fig = px.bar(df_summary, x='Data', y='Valor', color='Tipo', barmode='group',
+        #              title='Receitas e Despesas ao Longo do Tempo',
+        #              labels={'Valor': 'Valor (R$)', 'Data': 'Data'},
+        #              template='plotly_white',
+        #              color_discrete_map={"Receita": "#09AB3B", "Despesa": "#FF2B2B"})
+        # st.plotly_chart(fig)
 
-        # Criar gráfico de barras
-        fig = px.bar(df_summary, x='Data', y='Valor', color='Tipo', barmode='group',
-                     title='Receitas e Despesas ao Longo do Tempo',
-                     labels={'Valor': 'Valor (R$)', 'Data': 'Data'},
-                     template='plotly_white',
-                     color_discrete_map={"Receita": "#09AB3B", "Despesa": "#FF2B2B"})  # Especificar as cores
-
+        # Gráfico de linha
+        fig = px.line(df_summary, x='Data', y='Valor', color='Tipo',
+                      title='Receitas e Despesas ao Longo do Tempo',
+                      labels={'Valor': 'Valor (R$)', 'Data': 'Data'},
+                      template='plotly_white',
+                      color_discrete_map={"Receita": "#09AB3B", "Despesa": "#FF2B2B"})
         st.plotly_chart(fig)
 
+
+
+        # Exibir DataFrame como uma tabela
+        st.subheader("📋 Transações Recentes")
+        show_all = st.checkbox("Mostrar Todas as Entradas", value=False)
+
+        if show_all:
+            st.dataframe(df_filtered, use_container_width=True)
+        else:
+            st.dataframe(df_filtered.head(30), use_container_width=True)
+
         # Seção para selecionar e editar transações
-        st.subheader("✏️ Editar Transação")
-        transaction_id = st.selectbox("Selecione a Transação para Editar:", df_transactions.index)
-        selected_transaction = df_transactions.loc[transaction_id]
+        if st.checkbox("✏️ Editar Transação", value=False):
+            transaction_id = st.selectbox("Selecione a Transação para Editar:", df_filtered.index)
+            selected_transaction = df_filtered.loc[transaction_id]
 
-        # Exibir detalhes da transação selecionada
-        st.write("### Detalhes da Transação")
-        st.write(f"**Data:** {selected_transaction['Data']}")
-        st.write(f"**Descrição:** {selected_transaction['Descrição']}")
-        st.write(f"**Valor:** R$ {selected_transaction['Valor']}")
-        st.write(f"**Tipo:** {selected_transaction['Tipo']}")
-        st.write(f"**Categorias:** {selected_transaction['Categorias']}")
+            st.write("### Detalhes da Transação")
+            st.write(f"**Data:** {selected_transaction['Data']}")
+            st.write(f"**Descrição:** {selected_transaction['Descrição']}")
+            st.write(f"**Valor:** R$ {selected_transaction['Valor']}")
+            st.write(f"**Tipo:** {selected_transaction['Tipo']}")
+            st.write(f"**Categorias:** {selected_transaction['Categorias']}")
 
-        render_formulario_edicao(get_transaction(transaction_id))
+            render_formulario_edicao(get_transaction(transaction_id))
 
     else:
         st.write("Nenhuma transação encontrada.")
