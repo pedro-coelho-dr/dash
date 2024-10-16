@@ -85,7 +85,39 @@ def overview():
                       color_discrete_map={"Receita": "#09AB3B", "Despesa": "#FF2B2B"})
         st.plotly_chart(fig)
 
+        # Donut chart for Métodos de Pagamento
+        if 'Método de Pagamento' in df_filtered.columns:
+            payment_method_counts = df_filtered['Método de Pagamento'].value_counts().reset_index()
+            payment_method_counts.columns = ['Método de Pagamento', 'Contagem']  # Rename columns
 
+            # Create donut chart for payment methods
+            fig_payment_methods = px.pie(payment_method_counts, values='Contagem', names='Método de Pagamento', 
+                                        title='Métodos de Pagamento', 
+                                        hole=0.4,  # More pronounced donut hole
+                                        template='plotly_dark')  # Use a dark theme
+
+            fig_payment_methods.update_traces(textinfo='percent+label', hoverinfo='label+percent+value')
+
+            st.plotly_chart(fig_payment_methods)
+        else:
+            st.write("Nenhuma informação de métodos de pagamento disponível.")
+
+        # Donut chart for Bancos
+        if 'Banco' in df_filtered.columns:
+            bank_counts = df_filtered['Banco'].value_counts().reset_index()
+            bank_counts.columns = ['Banco', 'Contagem']  # Rename columns
+
+            # Create donut chart for banks
+            fig_banks = px.pie(bank_counts, values='Contagem', names='Banco', 
+                            title='Bancos', 
+                            hole=0.4,
+                            template='plotly_dark')  # Use a dark theme
+
+            fig_banks.update_traces(textinfo='percent+label', hoverinfo='label+percent+value')
+
+            st.plotly_chart(fig_banks)
+        else:
+            st.write("Nenhuma informação de bancos disponível.")
 
         # Exibir DataFrame como uma tabela
         st.subheader("📋 Transações Recentes")

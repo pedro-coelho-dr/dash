@@ -205,20 +205,28 @@ def get_Transactions_Dataframe():
     # Converter registros de transações para um DataFrame do Pandas
     if transactions:
         transaction_data = {
+            "ID": [],
             "Data": [],
-            "Descrição": [],
-            "Valor": [],
             "Tipo": [],
-            "Categorias": []  # categorias como strings ["cat1, cat2", "cat2", "cat1, cat3", ...]
+            "Descrição": [],
+            "Método de Pagamento": [],
+            "Banco": [],
+            "Valor": [],
+            "Categorias": [],
+            "Notas": []
         }
         
         # Armazenar todas as transações no dicionário por coluna
         for t in transactions:
+            transaction_data["ID"].append(t.id)
             transaction_data["Data"].append(t.date)
-            transaction_data["Descrição"].append(t.description)
-            transaction_data["Valor"].append(t.value)
             transaction_data["Tipo"].append("Receita" if t.type == TransactionTypeEnum.CREDITO.name else "Despesa")
+            transaction_data["Descrição"].append(t.description)
+            transaction_data["Método de Pagamento"].append(t.payment_method)
+            transaction_data["Banco"].append(t.bank)
+            transaction_data["Valor"].append(t.value)
             transaction_data["Categorias"].append(", ".join([cat.name for cat in t.categories]))
+            transaction_data["Notas"].append(t.notes)
 
     # Criar DataFrame com dicionário
     df_transactions = pd.DataFrame(transaction_data)
