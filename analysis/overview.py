@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.express as px
 from database.db_handler import get_Transactions_Dataframe, get_transaction
 from forms.edit_register import render_formulario_edicao
-from analysis.utils import filter_df_date
+from utils.filter_df_date import filter_df_date
 
 def overview():
     st.title("💸 Visão Geral")

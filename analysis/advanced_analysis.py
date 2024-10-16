@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from database.db_handler import get_Transactions_Dataframe, TransactionTypeEnum
-from analysis.utils import filter_df_date
+from utils.filter_df_date import filter_df_date
 
 
 # Função para gerar gráfico de barras sobrepostas dos saldos por categoria

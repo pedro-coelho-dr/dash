@@ -231,3 +231,20 @@ def get_Transactions_Dataframe():
     # Criar DataFrame com dicionário
     df_transactions = pd.DataFrame(transaction_data)
     return df_transactions
+
+# Função para deletar uma transação pelo ID
+def delete_transaction(id):
+    try:
+        # Procurar a transação pelo ID
+        transaction = session.query(Transaction).filter_by(id=id).first()
+        if not transaction:
+            raise ValueError(f"Transaction with id {id} not found.")
+        
+        # Deletar a transação
+        session.delete(transaction)
+        session.commit()
+        print(f"Transaction with id {id} deleted.")
+        
+    except Exception as e:
+        session.rollback()  # Desfaz qualquer mudança em caso de erro
+        raise ValueError(f"Error deleting transaction: {e}")
