@@ -63,7 +63,7 @@ class Transaction(Base):
     categories = relationship("Category", secondary=transaction_category_association)  # Lista de Category/ Relacionamento N:N
     notes = Column(Text)  # Observações
 
-    def __init__(self, date:Date, type:String, description:String, payment_method:String, bank:String, value:Float, categories:list[Category], notes:Text):
+    def __init__(self, date:Date, type:String, description:String, payment_method:String, bank:String, value:Float, categories:list[Category], notes:Text, id:Integer=None):
         # Chama o construtor da classe Base (declarative_base) para garantir a compatibilidade com o SQLAlchemy
         super(Transaction, self).__init__()
 
@@ -85,6 +85,7 @@ class Transaction(Base):
         
 
         # Defina os atributos
+        self.id = id
         self.date = date
         self.type = type
         self.description = description
@@ -140,16 +141,7 @@ def update_transaction(transaction):
         persisted_transaction.payment_method = transaction.payment_method
         persisted_transaction.bank = transaction.bank
         persisted_transaction.value = transaction.value
-
-        # Handling the category conversion from strings to Category objects
-        persisted_transaction.categories.clear()  # Clear existing categories
-        for category_name in transaction.categories:
-            category = session.query(Category).filter_by(name=category_name).first()
-            if not category:
-                category = Category(name=category_name)
-                session.add(category)
-            persisted_transaction.categories.append(category)
-
+        persisted_transaction.categories = transaction.categories
         persisted_transaction.notes = transaction.notes
 
         # Commit the changes to the database
@@ -241,7 +233,7 @@ def get_Transactions_Dataframe():
     df_transactions = pd.DataFrame(transaction_data)
     # Normalizar dados
     df_transactions['Data'] = pd.to_datetime(df_transactions['Data'])  # Certificar que 'Data' está no formato datetime
-    
+
     return df_transactions
 
 # Função para deletar uma transação pelo ID

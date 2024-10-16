@@ -23,8 +23,8 @@ def render_transactions_as_cards(df):
             col3.markdown(f"**Categorias:** {row['Categorias']}")
 
             # Add buttons for Edit and Delete in the fourth column
-            edit_button = col4.button("✏️ Editar", key=f"edit_{row['ID']}")
-            delete_button = col4.button("🗑️ Excluir", key=f"delete_{row['ID']}")
+            edit_button = col4.checkbox("✏️ Editar", key=f"edit_{row['ID']}")
+            delete_button = col4.checkbox("🗑️ Excluir", key=f"delete_{row['ID']}")
 
             st.markdown("---")
 
@@ -33,12 +33,24 @@ def render_transactions_as_cards(df):
 
                 render_formulario_edicao(selected_transaction)
 
+            # Botão inicial para deletar
             if delete_button:
-                try:
-                    delete_transaction(row['ID'])
-                    st.success(f"✅ Transação ID {row['ID']} excluída com sucesso!")
-                except Exception as e:
-                    st.error(f"❌ Não foi possível excluir a transação: {e}")
+                # Exibe uma mensagem de confirmação
+                st.warning(f"Tem certeza que deseja deletar a transação ID {row['ID']}?")
+                
+                # Botão de confirmação final
+                confirm_delete = st.button('Sim, deletar', key=f"confirm_delete_{row['ID']}")
+                cancel_delete = st.button('Cancelar', key=f"cancel_delete_{row['ID']}")
+
+                if confirm_delete:
+                    try:
+                        delete_transaction(row['ID'])
+                        st.success(f"✅ Transação ID {row['ID']} excluída com sucesso!")
+                    except Exception as e:
+                        st.error(f"❌ Não foi possível excluir a transação: {e}")
+                
+                if cancel_delete:
+                    st.info("A exclusão da transação foi cancelada.")
 
 
 def search_all_columns(df, search_term):

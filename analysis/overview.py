@@ -100,8 +100,8 @@ def overview():
 
         # Seção para selecionar e editar transações
         if st.checkbox("✏️ Editar Transação", value=False):
-            transaction_id = st.selectbox("Selecione a Transação para Editar:", df_filtered.index)
-            selected_transaction = df_filtered.loc[transaction_id]
+            transaction_id = st.selectbox("Selecione a Transação para Editar:", df_filtered["ID"])
+            selected_transaction = df_filtered.loc[transaction_id-1]
 
             st.write("### Detalhes da Transação")
             st.write(f"**Data:** {selected_transaction['Data']}")
