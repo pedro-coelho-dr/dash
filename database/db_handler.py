@@ -129,27 +129,36 @@ def get_transaction(id):
     except Exception as e:
         raise ValueError(f"Error retrieving transaction: {e}")
 
-# Função para editar transações
 def update_transaction(transaction):
     try:
         persisted_transaction = get_transaction(transaction.id)
-        
-        # Modifica os atributos da transação
+
+        # Updating the transaction's attributes
         persisted_transaction.date = transaction.date
         persisted_transaction.type = transaction.type
         persisted_transaction.description = transaction.description
         persisted_transaction.payment_method = transaction.payment_method
         persisted_transaction.bank = transaction.bank
         persisted_transaction.value = transaction.value
-        persisted_transaction.categories = transaction.categories
+
+        # Handling the category conversion from strings to Category objects
+        persisted_transaction.categories.clear()  # Clear existing categories
+        for category_name in transaction.categories:
+            category = session.query(Category).filter_by(name=category_name).first()
+            if not category:
+                category = Category(name=category_name)
+                session.add(category)
+            persisted_transaction.categories.append(category)
+
         persisted_transaction.notes = transaction.notes
-        
-        # As alterações feitas em 'persisted_transaction' são automaticamente detectadas
-        session.commit()  # As mudanças são persistidas no banco de dados
+
+        # Commit the changes to the database
+        session.commit()
 
     except Exception as e:
-        session.rollback()  # Desfaz qualquer mudança em caso de erro
-        raise ValueError(f"Error editing transaction: {e}") # Re-raise se a transação não for encontrada
+        session.rollback()
+        raise ValueError(f"Error editing transaction: {e}")
+
 
 
 # Função para adicionar transações
