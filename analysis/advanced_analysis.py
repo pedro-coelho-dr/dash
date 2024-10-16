@@ -134,9 +134,10 @@ def advanced_analysis():
 
     if not df.empty:
         # Exibir diferentes gráficos
-        plot_overlapped_bar_chart(df)
+        
         plot_sunburst_chart(df)
         plot_line_chart(df)
+        plot_overlapped_bar_chart(df)
         plot_area_chart(df)
         plot_scatter_chart(df)
     else:
