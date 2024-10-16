@@ -109,7 +109,6 @@ def balance_histogram(df):
     ]
 
     # Exibir gráfico no Streamlit
-    st.subheader("Histograma de Saldo Diário")
     renderLightweightCharts([
         {
             "chart": priceVolumeChartOptions,
