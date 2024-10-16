@@ -2,8 +2,7 @@ from datetime import timedelta
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from database.db_handler import get_Transactions_Dataframe, get_transaction
-from forms.edit_register import render_formulario_edicao
+import streamlit_lightweight_charts.dataSamples as data
 
 # Filtrar periodo de analise
 def filter_df_date(df):
@@ -45,3 +44,16 @@ def filter_df_date(df):
         df = df[(df['Ano'] == selected_year) & (df['Mês'] == selected_month)]
         
     return df
+
+
+
+
+
+def balance_histogram():
+    print(data.priceVolumeSeriesHistogram)
+
+
+
+# testar analises
+if __name__ == '__main__':
+    balance_histogram()

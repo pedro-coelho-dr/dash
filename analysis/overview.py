@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 from database.db_handler import get_Transactions_Dataframe, get_transaction
 from forms.edit_register import render_formulario_edicao
+from analysis.utils import filter_df_date
 
 def overview():
     st.title("💸 Visão Geral")
@@ -16,44 +17,8 @@ def overview():
         df_transactions['Data'] = pd.to_datetime(df_transactions['Data'])  # Certificar que 'Data' está no formato datetime
         df_transactions = df_transactions.sort_values(by="Data", ascending=False)  # Ordena pela coluna 'Data'
 
-        # Filtrar periodo de analise
-        st.subheader("📅 Filtrar por Período")
-        # Checkbox para ativar filtro customizado
-        if st.checkbox("Usar filtro personalizado de período"):
-            # Seção de filtro por período
-            col1, col2 = st.columns(2)
-            start_date = col1.date_input("Data de Início", df_transactions['Data'].max().date() - timedelta(days=30))
-            end_date = col2.date_input("Data de Fim", df_transactions['Data'].max().date())
-
-            # Filtrar o DataFrame pelas datas selecionadas
-            df_filtered = df_transactions[(df_transactions['Data'] >= pd.to_datetime(start_date)) & 
-                                        (df_transactions['Data'] <= pd.to_datetime(end_date))]
-        else:
-
-            # Adicionar colunas de ano e mês para facilitar o filtro
-            df_transactions['Ano'] = df_transactions['Data'].dt.year
-            df_transactions['Mês'] = df_transactions['Data'].dt.month
-
-            # Filtro por ano e mês
-            col1, col2 = st.columns(2)
-           # Obter o último ano e mês a partir dos dados
-            last_year = df_transactions['Ano'].max()
-            last_month = df_transactions[df_transactions['Ano'] == last_year]['Mês'].max()
-
-            # Seleção do ano com o último ano como padrão
-            selected_year = col1.selectbox("Selecione o Ano", 
-                                        options=sorted(df_transactions['Ano'].unique(), reverse=True),
-                                        index=sorted(df_transactions['Ano'].unique(), reverse=True).index(last_year))
-
-            # Seleção do mês com o último mês como padrão
-            selected_month = col2.selectbox("Selecione o Mês", 
-                                            options=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-                                            format_func=lambda x: pd.to_datetime(f'2024-{x:02d}-01').strftime('%B'),
-                                            index=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].index(last_month))
-
-            # Filtrar o DataFrame com base no mês e ano selecionados
-            df_filtered = df_transactions[(df_transactions['Ano'] == selected_year) & (df_transactions['Mês'] == selected_month)]
-
+        # filtrar dataframe por data
+        df_filtered = filter_df_date(df_transactions)
 
 
         # Calcular total de receitas e despesas
