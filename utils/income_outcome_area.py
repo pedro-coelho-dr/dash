@@ -100,8 +100,6 @@ def income_outcome_area(df):
     ]
 
     # Renderizando o gráfico
-    st.subheader("Gráfico de Receitas (Verde) vs Despesas (Vermelho)")
-
     renderLightweightCharts([
         {
             "chart": overlaidAreaSeriesOptions,
