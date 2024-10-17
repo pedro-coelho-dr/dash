@@ -19,17 +19,24 @@ Este projeto é parte da disciplina **Projetos 5** do curso de **Ciência da Com
    ```bash
    git clone https://github.com/pedro-coelho-dr/dash.git
    ```
+   ```bash
+   cd dash
+   ```
 
 - Crie e ative o ambiente virtual:   
   
     Linux:
    ```bash
    python3 -m venv venv
+   ```
+   ```bash
    source venv/bin/activate
    ```
     Windows:
    ```bash
    python -m venv venv
+   ```
+   ```bash
    venv\Scripts\activate
    ```
 
