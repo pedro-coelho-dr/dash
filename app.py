@@ -2,10 +2,18 @@ import streamlit as st
 from forms import transactions 
 from analysis import overview, advanced_analysis
 
+# Set the page configuration
+st.set_page_config(
+    page_title="Nimbo",  # Title in the browser tab
+    page_icon="☁️",  # Cloud icon (you can replace with a URL to a custom icon)
+    layout="wide",  # Wide layout for better use of space
+    initial_sidebar_state="expanded"  # Sidebar starts expanded
+)
+
 # Sidebar menu for navigation
-st.sidebar.title("Menu Principal")
+st.sidebar.title("☁️ Nimbo")
 menu_option = st.sidebar.radio(
-    "Selecione uma opção:", 
+    ">>", 
     ["Visão Geral", "Análise Avançada", "Transações"]
 )
 
@@ -17,4 +25,4 @@ elif menu_option == "Análise Avançada":
     advanced_analysis.advanced_analysis()
 
 elif menu_option == "Transações":
-    transactions.render_transaction_page()
+    transactions.render_transaction_page()  

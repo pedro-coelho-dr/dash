@@ -44,6 +44,10 @@ def balance_histogram(df):
     # Converter o DataFrame
     histogram_data = df_to_histogram_data(df)
 
+    # Criar dados para a linha horizontal no ponto 0
+    zero_line_data = [{"time": entry["time"], "value": 0} for entry in histogram_data]
+
+
     # Configurações do gráfico
     priceVolumeChartOptions = {
         "height": 400,
@@ -52,6 +56,14 @@ def balance_histogram(df):
                 "top": 0.2,
                 "bottom": 0.25,
             },
+            
+            "autoScale": True,  # Permite que o gráfico ajuste os valores automaticamente
+
+            "priceFormat": {
+            "type": 'price',
+            "precision": 2,  # Duas casas decimais
+            },
+
             "borderVisible": False,
         },
         "overlayPriceScales": {
@@ -74,7 +86,9 @@ def balance_histogram(df):
             "horzLines": {
                 "color": 'rgba(42, 46, 57, 0.6)',
             }
-        }
+        },
+
+       
     }
 
     # Dados de exemplo para a série do gráfico
@@ -105,7 +119,21 @@ def balance_histogram(df):
                     "bottom": 0,
                 }
             }
-        }
+        },
+        {
+            "type": 'Line',  # Série para a linha horizontal no ponto zero
+            "data": zero_line_data,
+            "options": {
+                "color": 'rgba(255, 255, 0, 0.5)',  # Linha amarela
+                "lineWidth": 1,  # Espessura da linha
+                "crossHairMarkerVisible": False,  # Desativa o marcador de foco no mouse
+                "crosshairMarkerRadius": 0,
+                "pointMarkerVisible": True,
+                "hoveredMarkerVisible": False,  # Desativa o foco quando o mouse passa por cima
+                "lastValueVisible": True,  # Remove o destaque do último valor
+                "priceLineVisible": True  # Remove a linha de preço interativa
+            }
+        },
     ]
 
     # Exibir gráfico no Streamlit
