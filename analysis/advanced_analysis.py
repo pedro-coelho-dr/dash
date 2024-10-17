@@ -138,7 +138,7 @@ def plot_scatter_chart(df):
 
 # Seção de Análise Avançada
 def advanced_analysis():
-    st.title("📊 Análise Avançada - Comparação de Categorias")
+    st.title("📊 Análise Avançada")
 
     df = get_Transactions_Dataframe()
     df['Data'] = pd.to_datetime(df['Data'])

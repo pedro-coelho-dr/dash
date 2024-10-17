@@ -1,7 +1,48 @@
+[global]
+disableWidgetStateDuplicationWarning = true
+
+showWarningOnDirectExecution = false
+
+[logger]
+level = "error"
+
+[client]
+# Keep error details visible in the browser so users can see what went wrong if an issue occurs.
+showErrorDetails = true
+
+# Set the toolbar to "viewer" mode to hide developer options from the user and make the UI cleaner.
+toolbarMode = "viewer"
+
+[runner]
+# Keep fast reruns enabled to make the app responsive to interactions.
+fastReruns = true
+
+[server]
+# Auto-rerun the app when files are saved. This makes it easier for testers who may modify code or configuration during the test.
+runOnSave = true
+
+# Open the browser automatically when the app starts to reduce friction for users.
+headless = false
+
+# Keep CORS protection enabled for security, especially if the app is tested over a network.
+enableCORS = true
+
+# Enable XSRF protection to ensure cross-site request forgery protection.
+enableXsrfProtection = true
+
+[browser]
+# Keep this to localhost unless the app is being tested remotely.
+serverAddress = "localhost"
+
+# Automatically gather usage statistics to monitor performance during the test.
+gatherUsageStats = true
+
+
 [theme]
-base="dark"  # Usar o tema base escuro
-primaryColor="#1565C0"
-backgroundColor="#0A0F14"  # Fundo bem escuro, quase preto, semelhante ao da imagem
-secondaryBackgroundColor="#161D24"  # Cinza escuro para contrastar com o fundo principal
-textColor="#BFBFBF"  # Cinza claro, para garantir boa legibilidade
-font="sans serif"  # Manter uma fonte moderna e limpa
+# Keep your existing dark theme configuration.
+base = "dark"
+primaryColor = "#1565C0"
+backgroundColor = "#0A0F14"
+secondaryBackgroundColor = "#161D24"
+textColor = "#BFBFBF"
+font = "sans serif"
