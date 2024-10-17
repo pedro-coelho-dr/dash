@@ -1,18 +1,17 @@
 
 # ☁️ Nimbo
-
-Este projeto é parte da disciplina **Projetos 5** do curso de **Ciência da Computação e Design** da **Cesar School**. O objetivo deste aplicativo é fornecer uma plataforma de gestão financeira para {}, permitindo {}.
-
-[Google Site do Projeto](https://link-para-o-google-site)
+Este projeto é parte da disciplina **Projetos 5** do curso de **Ciência da Computação** e **Design** da [**Cesar School**](https://cesar.school). O objetivo deste aplicativo é fornecer uma plataforma de gestão financeira para a [Eceel-Tec](https://eceel-tec.com.br/) uma empresa de assistência técnica, permitindo o acompanhamento de entradas, saídas, e visualização e análise avançada de dados financeiros.
 
 ## Status
+Estamos na fase do Status Report 1, focada na aquisição e análise inicial de dados, definição de métricas de desempenho, e criação das primeiras visualizações. O protótipo atual está em desenvolvimento, com as funcionalidades principais sendo testadas e refinadas.
 
-Explicar aqui o status do projeto, os proximos passos, os requerimentos, etc.. explicação geral
+Próximos Passos:
+- Análise Aprofundada: Aplicação de técnicas de análise mais complexas, como análise multivariada, relacionando múltiplas variáveis para insights mais ricos.
+- Dashboard Baseado em Métricas: Expansão do dashboard atual para incluir as métricas e indicadores definidos, apresentando uma visualização mais detalhada e informativa.
+- Storytelling com Dados: Desenvolvimento de técnicas de apresentação para comunicar insights de forma clara e impactante, utilizando storytelling com os dados.
 
----
 
 ## Instalação e Execução
-
 ### Pré-requisitos
 - **Python**
 - **Streamlit** e outras bibliotecas listadas em `requirements.txt`.
@@ -119,19 +118,19 @@ Compara lado a lado as receitas e despesas por categorias, utilizando cores dist
 
 ![alt text](/screenshots/newplot_(5).png)
 
-
-
 ## Vídeo Demo
-
 
 
 ## Equipe
 
-
-
-Logo Cesar School  
-
-Logo Nimbus
+- Caio Hirata
+- Camila Cirne
+- Clara Wanderley
+- Gabriela Viana
+- Leo Kaiser
+- Pedro Coelho
+- Virna Amaral
+- Yara Rodrigues
 
 ---
 
