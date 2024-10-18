@@ -205,7 +205,6 @@ Compara lado a lado as receitas e despesas por categorias, utilizando cores dist
 - Pedro Coelho
 - Virna Amaral
 - Yara Rodrigues
-- 
 
 ## Devs
 <table>
