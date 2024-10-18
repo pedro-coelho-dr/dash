@@ -1,8 +1,73 @@
 # ☁️ Nimbo
-Este projeto é parte da disciplina **Projetos 5** do curso de **Ciência da Computação** e **Design** da [**Cesar School**](https://cesar.school). O objetivo deste aplicativo é fornecer uma plataforma de gestão financeira para a [Eceel-Tec](https://eceel-tec.com.br/) uma empresa de assistência técnica, permitindo o acompanhamento de entradas, saídas, e visualização e análise avançada de dados financeiros.
 
-## Status
-Estamos na fase do Status Report 1, focada na aquisição e análise inicial de dados, definição de métricas de desempenho, e criação das primeiras visualizações. O protótipo atual está em desenvolvimento, com as funcionalidades principais sendo testadas e refinadas.
+**Nimbo** é uma plataforma de gestão financeira desenvolvida para a [**Eceel-Tec**](https://eceel-tec.com.br/), uma empresa de assistência técnica, como parte da disciplina **Projetos 5** dos cursos de **Ciência da Computação** e **Design** da [**Cesar School**](https://cesar.school). O objetivo é facilitar o acompanhamento de **entradas** e **saídas**, além de oferecer **visualizações** e **análises avançadas** dos dados financeiros da empresa.
+
+---
+
+## 🚧 Status
+
+Estamos atualmente na fase do **Status Report 1**, que foca nas seguintes atividades:
+
+- Aquisição e análise inicial dos dados
+- Definição de métricas de desempenho
+- Criação das primeiras visualizações
+
+O protótipo está em desenvolvimento, com as funcionalidades principais sendo testadas e refinadas.
+
+---
+
+## 🔍 Processo
+
+Para definir as análises a serem realizadas, foi necessário documentar os dados registrados pela empresa. Descobrimos que os dados estavam distribuídos em cinco planilhas no Excel:
+
+- **3 planilhas** contendo o histórico de transações (cada uma de um banco diferente)
+- **1 planilha** agrupando todas as despesas com anotações adicionais
+- **1 planilha** registrando o histórico de serviços prestados
+
+Com base nessas planilhas, extraímos informações financeiras, incluindo:
+
+- **Data**
+- **Valor**
+- **Banco** (referente à planilha)
+- **Tipo de transação** (crédito/débito)
+- **Detalhes descritivos** (método de pagamento, destinatário/remetente, descrição)
+
+### 🗂 Estrutura Unificada de Dados
+
+Após essa análise, decidimos criar uma estrutura única para consolidar os dados em um só lugar. A estrutura definida é a seguinte:
+
+| Campo               | Descrição                                                    |
+|---------------------|--------------------------------------------------------------|
+| **ID**              | Identificador único da transação                             |
+| **Data**            | Data da transação                                            |
+| **Tipo**            | Tipo de transação (crédito/débito)                           |
+| **Descrição**       | Texto descritivo da transação                                |
+| **Método de Pagamento** | Meio utilizado na transação (PIX, cartão, dinheiro, etc.)   |
+| **Banco**           | Banco onde a transação foi realizada                         |
+| **Valor**           | Valor monetário da transação                                 |
+| **Observações**     | Notas adicionais sobre a transação                           |
+| **Categorias**      | Lista de categorias associadas à transação (serviço, compra, venda, etc.) |
+
+Essa estrutura centralizada facilita a análise específica de cada transação e otimiza a visualização dos dados financeiros da empresa.
+
+## 📊 Análises
+
+Com a nova estrutura de dados estabelecida, definimos o **valor das transações** como a métrica principal e identificamos quais análises financeiras seriam mais úteis para a empresa. Concluímos que as seguintes análises seriam essenciais:
+
+1. **Distribuição das despesas e receitas ao longo do tempo**  
+   Utilizamos um gráfico de volumes sobrepostos, onde um volume representa as receitas e outro as despesas, permitindo uma comparação clara entre as duas categorias ao longo do tempo.
+
+2. **Distribuição dos saldos diários**  
+   Implementamos um gráfico de volume combinado com um histograma no mesmo eixo temporal, facilitando a visualização do saldo acumulado e das variações de cada dia, destacando picos e quedas.
+
+3. **Distribuição dos valores das transações por categoria**  
+   Para essa análise, utilizamos quatro gráficos distintos:
+   - Um **histograma emparelhado** (receitas e despesas) em função das categorias, destacando a frequência de transações em cada uma.
+   - Dois **boxplots**, um para cada tipo de transação (receita e despesa), agrupados por categoria, mostrando a variação dos valores dentro de cada grupo.
+   - Um gráfico de **sunburst**, que agrupa as categorias dentro dos tipos de transação (receita e despesa), exibindo a distribuição proporcional (%) de cada categoria, permitindo uma visão clara das proporções.
+
+Essas visualizações oferecem insights valiosos sobre o comportamento financeiro da empresa, facilitando a tomada de decisões estratégicas.
+
 
 **Próximos Passos:**
 - Análise Aprofundada: Aplicação de técnicas de análise mais complexas, como análise multivariada, relacionando múltiplas variáveis para insights mais ricos.
