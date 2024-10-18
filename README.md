@@ -205,3 +205,49 @@ Compara lado a lado as receitas e despesas por categorias, utilizando cores dist
 - Pedro Coelho
 - Virna Amaral
 - Yara Rodrigues
+- 
+
+## Devs
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Kal-0">
+        <img src="https://avatars.githubusercontent.com/u/106926790?s=400&u=d51d91a8d447afbb4a9d0be21d664b82d7091fc5&v=4" width="100px;" alt="Foto Kal"/><br>
+        <sub>
+          <b>Caio Cesar</b>
+        </sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/camilacirne">
+        <img src="https://avatars.githubusercontent.com/u/28824856?v=4" width="100px;" alt="Foto Kal"/><br>
+        <sub>
+          <b>Camila Cirne</b>
+        </sub>
+      </a>
+    </td>
+     <td align="center">
+      <a href="https://github.com/pedro-coelho-dr">
+        <img src="https://avatars.githubusercontent.com/u/111138996?v=4" width="100px;" alt="Foto Kal"/><br>
+        <sub>
+          <b>Pedro Coelho</b>
+        </sub>
+      </a>
+    </td>
+     <td align="center">
+      <a href="https://github.com/virnaamaral">
+        <img src="https://avatars.githubusercontent.com/u/116957619?v=4" width="100px;" alt="Foto Kal"/><br>
+        <sub>
+          <b>Virna Amaral</b>
+        </sub>
+      </a>
+    </td>
+     <td align="center">
+      <a href="https://github.com/Yara-R">
+        <img src="https://avatars.githubusercontent.com/u/103130662?v=4" width="100px;" alt="Foto Kal"/><br>
+        <sub>
+          <b>Yara Rodrigues</b>
+        </sub>
+      </a>
+    </td>
+  </table>
