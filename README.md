@@ -60,7 +60,13 @@ Com a nova estrutura de dados estabelecida, definimos o **valor das transações
 2. **Distribuição dos saldos diários**  
    Implementamos um gráfico de volume combinado com um histograma no mesmo eixo temporal, facilitando a visualização do saldo acumulado e das variações de cada dia, destacando picos e quedas.
 
-3. **Distribuição dos valores das transações por categoria**  
+3. **Distribuição dos métodos de pagamento**  
+   Utilizamos um gráfico de **donut** para representar a distribuição em porcentagem dos métodos de pagamento utilizados (PIX, cartão, dinheiro, etc.), fornecendo uma visão clara das preferências de pagamento da empresa.
+
+4. **Distribuição dos bancos utilizados nas transações**  
+   Também aplicamos um gráfico de **donut** para ilustrar a distribuição dos bancos utilizados nas transações, destacando quais instituições financeiras são mais frequentes nas operações da empresa.
+
+5. **Distribuição dos valores das transações por categoria**  
    Para essa análise, utilizamos quatro gráficos distintos:
    - Um **histograma emparelhado** (receitas e despesas) em função das categorias, destacando a frequência de transações em cada uma.
    - Dois **boxplots**, um para cada tipo de transação (receita e despesa), agrupados por categoria, mostrando a variação dos valores dentro de cada grupo.
