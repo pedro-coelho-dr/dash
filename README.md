@@ -110,7 +110,11 @@ Essas visualizações oferecem insights valiosos sobre o comportamento financeir
    python -m venv venv
    ```
    ```bash
-   venv\Scripts\activate
+   .\venv\Scripts\activate
+   ```
+   caso ExecutionPolicy esteja restrito:
+   ```bash
+   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
    ```
 
 - Instale as dependências:
