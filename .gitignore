@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 #database/database.db
 database/seed.csv
+database/seed2.csv

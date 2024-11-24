@@ -1,6 +1,6 @@
 import streamlit as st
 from forms import transactions 
-from analysis import overview, advanced_analysis
+from analysis import overview, advanced_analysis, time_series
 
 # Set the page configuration
 st.set_page_config(
@@ -14,7 +14,7 @@ st.set_page_config(
 st.sidebar.title("☁️ Nimbo")
 menu_option = st.sidebar.radio(
     ">>", 
-    ["Visão Geral", "Análise Avançada", "Transações"]
+    ["Visão Geral", "Análise Avançada", "Transações", "Séries Temporais"]
 )
 
 # Display sections based on the menu choice
@@ -25,4 +25,7 @@ elif menu_option == "Análise Avançada":
     advanced_analysis.advanced_analysis()
 
 elif menu_option == "Transações":
-    transactions.render_transaction_page()  
+    transactions.render_transaction_page()
+
+elif menu_option == "Séries Temporais":
+    time_series.render_time_series_page()
