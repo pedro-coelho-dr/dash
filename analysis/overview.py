@@ -8,7 +8,7 @@ from utils.balance_histogram import balance_histogram
 from utils.income_outcome_area import income_outcome_area
 
 def overview():
-    st.title("💸 Visão Geral")
+    st.title("Visão Geral")
 
     # Carregar as transações do banco de dados
     df_transactions = get_Transactions_Dataframe()
@@ -48,53 +48,85 @@ def overview():
 
         col1, col2 = st.columns(2)
 
-        # Donut chart for Métodos de Pagamento
+                # Donut chart for Métodos de Pagamento
         if 'Método de Pagamento' in df_filtered.columns:
-            col1.subheader("💳 Métodos de Pagamento")
+            st.subheader("💳 Métodos de Pagamento")
             payment_method_counts = df_filtered['Método de Pagamento'].value_counts().reset_index()
             payment_method_counts.columns = ['Método de Pagamento', 'Contagem']  # Rename columns
 
-            # Define a custom color palette
-            color_palette = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880']
+            # Custom color palette with 4 different tones
+            color_palette = ['#1565C0', '#FFC107', '#00CC96', '#AB63FA']
 
-            fig_payment_methods = px.pie(payment_method_counts, values='Contagem', names='Método de Pagamento',
-                                        hole=0.5,  # More pronounced donut hole
-                                        color_discrete_sequence=color_palette,  # Custom colors
-                                        template='plotly_dark')  # Use a dark theme
+            fig_payment_methods = px.pie(
+                payment_method_counts,
+                values='Contagem',
+                names='Método de Pagamento',
+                hole=0.4,  # Donut chart style
+                color_discrete_sequence=color_palette,  # Use the custom palette
+                template='plotly_dark'  # Dark theme for modern appearance
+            )
 
             # Enhance labels and hover info
-            fig_payment_methods.update_traces(textinfo='percent+label', hoverinfo='label+percent+value', 
-                                            marker=dict(line=dict(color='#000000', width=2)))  # Add border to slices
-            fig_payment_methods.update_layout(annotations=[dict(text='Métodos', x=0.5, y=0.5, font_size=20, showarrow=False)])
+            fig_payment_methods.update_traces(
+                textinfo='percent+label',
+                hoverinfo='label+percent+value',
+                marker=dict(line=dict(color='#FFFFFF', width=1.5))  # Add white border
+            )
+            fig_payment_methods.update_layout(
+                annotations=[dict(
+                    text='Métodos',
+                    x=0.5, y=0.5,
+                    font_size=18,
+                    font_family="Arial",
+                    showarrow=False
+                )],
+                font=dict(family="Arial", size=12, color="#E1E1E1")  # Update font to light gray
+            )
 
-            col1.plotly_chart(fig_payment_methods)
+            st.plotly_chart(fig_payment_methods, use_container_width=True)
 
         else:
-            col1.write("Nenhuma informação de métodos de pagamento disponível.")
+            st.write("Nenhuma informação de métodos de pagamento disponível.")
 
         # Donut chart for Bancos
         if 'Banco' in df_filtered.columns:
-            col2.subheader("🏦 Bancos Utilizados")
+            st.subheader("🏦 Bancos Utilizados")
             bank_counts = df_filtered['Banco'].value_counts().reset_index()
             bank_counts.columns = ['Banco', 'Contagem']  # Rename columns
 
-            # Define a custom color palette
-            color_palette_banks = ['#FF7F0E', '#2CA02C', '#D62728', '#9467BD', '#8C564B', '#E377C2', '#7F7F7F', '#BCBD22']
+            # Custom color palette with 4 different tones
+            color_palette_banks = ['#1565C0', '#FFC107', '#00CC96', '#AB63FA']
 
-            fig_banks = px.pie(bank_counts, values='Contagem', names='Banco', 
-                            hole=0.5,  # Donut chart
-                            color_discrete_sequence=color_palette_banks,  # Custom colors
-                            template='plotly_dark')
+            fig_banks = px.pie(
+                bank_counts,
+                values='Contagem',
+                names='Banco',
+                hole=0.4,  # Donut chart style
+                color_discrete_sequence=color_palette_banks,  # Use the custom palette
+                template='plotly_dark'
+            )
 
             # Enhance labels and hover info
-            fig_banks.update_traces(textinfo='percent+label', hoverinfo='label+percent+value', 
-                                    marker=dict(line=dict(color='#000000', width=2)))  # Add border to slices
-            fig_banks.update_layout(annotations=[dict(text='Bancos', x=0.5, y=0.5, font_size=20, showarrow=False)])
+            fig_banks.update_traces(
+                textinfo='percent+label',
+                hoverinfo='label+percent+value',
+                marker=dict(line=dict(color='#FFFFFF', width=1.5))  # Add white border
+            )
+            fig_banks.update_layout(
+                annotations=[dict(
+                    text='Bancos',
+                    x=0.5, y=0.5,
+                    font_size=18,
+                    font_family="Arial",
+                    showarrow=False
+                )],
+                font=dict(family="Arial", size=12, color="#E1E1E1")
+            )
 
-            col2.plotly_chart(fig_banks)
+            st.plotly_chart(fig_banks, use_container_width=True)
 
         else:
-            col2.write("Nenhuma informação de bancos disponível.")
+            st.write("Nenhuma informação de bancos disponível.")
 
 
     else:
