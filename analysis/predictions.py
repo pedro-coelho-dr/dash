@@ -11,8 +11,15 @@ def criar_saldo_mensal(df):
     saldo_mensal = df.groupby('Mês')['Saldo'].sum()
     return saldo_mensal
 
+# Função para criar série temporal semanal
+def criar_saldo_semanal(df):
+    df['Saldo'] = df['Valor'].where(df['Tipo'] == 'Receita', -df['Valor'])
+    df['Semana'] = df['Data'].dt.to_period('W').apply(lambda r: r.start_time)
+    saldo_semanal = df.groupby('Semana')['Saldo'].sum()
+    return saldo_semanal
+
 def render_predictions_page():
-    st.title("Previsão de Saldo Mensal")
+    st.title("Previsões de Saldo")
 
     # Carregar as transações do banco de dados
     df_transactions = get_Transactions_Dataframe()
@@ -21,92 +28,145 @@ def render_predictions_page():
         st.warning("⚠️ Nenhuma transação encontrada no banco de dados.")
         return
 
-    # Criar a série temporal mensal
+    # **Previsão Mensal**
     saldo_mensal = criar_saldo_mensal(df_transactions)
+    if len(saldo_mensal) >= 24:
+        current_year = pd.Timestamp.now().year
+        train_data = saldo_mensal[:f'{current_year - 1}-12-31']
 
-    if saldo_mensal.empty or len(saldo_mensal) < 24:
-        st.error("⚠️ Dados insuficientes para realizar previsões usando SARIMA.")
-        return
+        p, d, q = 1, 1, 1
+        P, D, Q, m = 1, 1, 1, 12
 
-    # Determinar o ano corrente
-    current_year = pd.Timestamp.now().year
-    train_end_year = current_year - 1
-
-    # Dividir os dados em treino e previsão
-    train_data = saldo_mensal[:f'{train_end_year}-12-31']
-
-    # Ajustar o modelo SARIMA
-    p, d, q = 1, 1, 1
-    P, D, Q, m = 1, 1, 1, 12
-
-    try:
-        model = SARIMAX(train_data, 
-                        order=(p, d, q), 
-                        seasonal_order=(P, D, Q, m), 
-                        enforce_stationarity=False, 
+        model = SARIMAX(train_data,
+                        order=(p, d, q),
+                        seasonal_order=(P, D, Q, m),
+                        enforce_stationarity=False,
                         enforce_invertibility=False)
         model_fit = model.fit(disp=False)
-    except Exception as e:
-        st.error(f"Erro ao ajustar o modelo SARIMA: {e}")
-        return
 
-    # Fazer previsões para o ano corrente
-    try:
-        forecast_steps = 12  # Previsões para os 12 meses do ano corrente
-        forecast_start = f'{current_year}-01-01'
-        final_predictions = model_fit.get_forecast(steps=forecast_steps)
-        forecast_index = pd.date_range(start=forecast_start, periods=forecast_steps, freq='M')
-        forecast_values = final_predictions.predicted_mean
-    except Exception as e:
-        st.error(f"Erro ao fazer previsões para {current_year}: {e}")
-        return
+        forecast_steps = 12
+        forecast_index = pd.date_range(start=f'{current_year}-01-01', periods=forecast_steps, freq='M')
+        forecast_values = model_fit.get_forecast(steps=forecast_steps).predicted_mean
 
-    # Plotar as previsões e os dados reais
-    try:
+        # Gerar índices de previsão e deslocar um passo para trás
+        forecast_index = pd.date_range(start=f'{current_year}-01-01', periods=forecast_steps, freq='M')
+        forecast_index = forecast_index - pd.offsets.MonthBegin(1)  # Deslocar para o início do mês anterior
+
+        # Obter valores previstos
+        forecast_values = model_fit.get_forecast(steps=forecast_steps).predicted_mean
+
+        # Gráfico Mensal
         plt.figure(figsize=(12, 6))
-
-        # Plotar os saldos reais mensais do ano corrente
-        actual_data = saldo_mensal[f'{current_year}-01-01':f'{current_year}-12-31']
+        actual_data = saldo_mensal[f'{current_year}-01-01':]
         if not actual_data.empty:
-            shifted_actual_data = actual_data.copy()
-            shifted_actual_data.index = shifted_actual_data.index.shift(1, freq='M')
             plt.plot(
-                shifted_actual_data.index,
-                shifted_actual_data.values,
+                actual_data.index,
+                actual_data.values,
                 label="Saldos Reais",
-                color="#007BFF",  # Azul vibrante
+                color="#007BFF",
                 marker='o',
-                linewidth=2,
-                alpha=0.8
+                linewidth=2
             )
 
-        # Plotar as previsões
+        # Plotar previsões com o índice ajustado
         plt.plot(
             forecast_index,
             forecast_values,
-            label=f"Previsões ({current_year})",
-            color="#FFC107",  # Amarelo vibrante
+            label="Previsões Mensais",
+            color="#FFC107",
             linestyle="--",
             marker='s',
-            linewidth=2,
-            alpha=0.9
+            linewidth=2
         )
-
-        # Estilização do gráfico
-        plt.title(f"Previsões de Saldo Mensal para {current_year}", fontsize=16, color="#333")
-        plt.xlabel("Meses", fontsize=12, color="#555")
-        plt.ylabel("Saldo", fontsize=12, color="#555")
-        plt.xticks(forecast_index, [date.strftime('%b') for date in forecast_index], rotation=45, fontsize=10)
-        plt.legend(fontsize=12, frameon=True, shadow=True, loc="upper left")
-        plt.grid(color="#DDDDDD", linestyle="--", linewidth=0.7, alpha=0.7)
-
-        # Adicionar borda ao gráfico
-        plt.gca().spines['top'].set_visible(False)
-        plt.gca().spines['right'].set_visible(False)
-        plt.gca().spines['left'].set_color('#CCCCCC')
-        plt.gca().spines['bottom'].set_color('#CCCCCC')
-
+        plt.title("Previsões de Saldo Mensal", fontsize=16)
+        plt.xlabel("Meses", fontsize=12)
+        plt.ylabel("Saldo", fontsize=12)
+        plt.xticks(rotation=45)
+        plt.legend(fontsize=10)
+        plt.grid(alpha=0.4)
         st.pyplot(plt)
 
-    except Exception as e:
-        st.error(f"Erro ao plotar os resultados: {e}")
+
+    # **Previsão Semanal**
+    saldo_semanal = criar_saldo_semanal(df_transactions)
+    if len(saldo_semanal) >= 16:
+        saldo_semanal_diff = saldo_semanal.diff().dropna()
+
+        total_data = saldo_semanal_diff
+        test_data = total_data[-12:]
+
+        p, d, q = 1, 0, 1
+        P, D, Q, m = 1, 0, 1, 52
+
+        model = SARIMAX(total_data,
+                        order=(p, d, q),
+                        seasonal_order=(P, D, Q, m),
+                        enforce_stationarity=False,
+                        enforce_invertibility=False)
+        model_fit = model.fit(disp=False)
+
+        predictions = model_fit.get_prediction(start=test_data.index[0], end=test_data.index[-1]).predicted_mean
+        future_predictions = model_fit.forecast(steps=4)
+        future_index = pd.date_range(start=test_data.index[-1] + pd.Timedelta(weeks=1), periods=4, freq='W')
+
+        last_known = saldo_semanal.iloc[-len(test_data) - 1]
+        predicted_mean_original = last_known + predictions.cumsum()
+        future_predictions_original = predicted_mean_original.iloc[-1] + future_predictions.cumsum()
+
+        # **Previsão Semanal**
+        saldo_semanal = criar_saldo_semanal(df_transactions)
+        if len(saldo_semanal) >= 16:
+            saldo_semanal_diff = saldo_semanal.diff().dropna()
+
+            total_data = saldo_semanal_diff
+            test_data = total_data[-12:]
+
+            p, d, q = 1, 0, 1
+            P, D, Q, m = 1, 0, 1, 52
+
+            model = SARIMAX(total_data,
+                            order=(p, d, q),
+                            seasonal_order=(P, D, Q, m),
+                            enforce_stationarity=False,
+                            enforce_invertibility=False)
+            model_fit = model.fit(disp=False)
+
+            predictions = model_fit.get_prediction(start=test_data.index[0], end=test_data.index[-1]).predicted_mean
+            future_predictions = model_fit.forecast(steps=4)
+            future_index = pd.date_range(start=test_data.index[-1] + pd.Timedelta(weeks=1), periods=4, freq='W')
+
+            # Gráfico Semanal
+            plt.figure(figsize=(14, 7))
+            plt.plot(
+                test_data.index,
+                test_data,
+                label="Dados Reais (Últimas 12 Semanas)",
+                color="#007BFF",
+                marker="o",
+                linewidth=2
+            )
+            plt.plot(
+                predictions.index,
+                predictions,
+                label="Previsões (Últimas 12 Semanas)",
+                color="#FFC107",
+                linestyle="--",
+                marker="o",
+                linewidth=2
+            )
+            plt.plot(
+                future_index,
+                future_predictions,
+                label="Previsões Futuras (4 Semanas)",
+                color="#FFC107",
+                linestyle="--",
+                marker="o",
+                linewidth=2
+            )
+            plt.title("Previsões Semanais (Últimas 12 Semanas + Próximas 4 Semanas)", fontsize=16)
+            plt.xlabel("Semanas", fontsize=12)
+            plt.ylabel("Saldo Diferenciado", fontsize=12)
+            plt.xticks(rotation=45)
+            plt.legend(fontsize=10)
+            plt.grid(alpha=0.4)
+            st.pyplot(plt)

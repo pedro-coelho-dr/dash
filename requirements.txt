@@ -36,6 +36,7 @@ mdurl==0.1.2
 narwhals==1.8.4
 nest-asyncio==1.6.0
 numpy==2.1.1
+nvidia-nccl-cu12==2.23.4
 packaging==24.1
 pandas==2.2.3
 parso==0.8.4
@@ -81,3 +82,4 @@ tzdata==2024.2
 urllib3==2.2.3
 watchdog==4.0.2
 wcwidth==0.2.13
+xgboost==2.1.3
