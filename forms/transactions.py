@@ -5,7 +5,9 @@ from forms.search_and_edit import search_and_edit_transactions
 
 # Function to render the transaction page
 def render_transaction_page():
-    st.title("💼 Transações")
+    st.title("Transações")
+    st.divider()
+
 
     # Buttons to switch between different transaction options
     selected_form = st.radio(
@@ -13,18 +15,23 @@ def render_transaction_page():
         ('Gerenciar Transações', 'Inserir Receita', 'Inserir Despesa'),
         index=0
     )
+    st.divider()
+
 
     # Render the appropriate form based on selection
     if selected_form == 'Inserir Receita':
-        st.header("💰 Inserir Receita")
+        st.header("Inserir Receita")
+        
         render_revenue_form()
 
     elif selected_form == 'Inserir Despesa':
-        st.header("💸 Inserir Despesa")
+        st.header("Inserir Despesa")
+        
         render_expense_form()
 
     elif selected_form == 'Gerenciar Transações':
-        st.header("🔍 Gerenciar Transações")
+        st.header("Gerenciar Transações")
+        
         search_and_edit_transactions()
 
 # Executing the transaction page

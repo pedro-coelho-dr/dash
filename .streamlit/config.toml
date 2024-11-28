@@ -1,10 +1,10 @@
 [theme]
-# Escolha uma base clara para um visual mais parecido com o exemplo.
-base = "light"
-primaryColor = "#FFC107"  # Amarelo vibrante para destacar elementos principais.
-backgroundColor = "#F4F6F8"  # Cinza claro para o fundo principal.
-secondaryBackgroundColor = "#FFFFFF"  # Branco para áreas de destaque.
-textColor = "#343A40"  # Cinza escuro para um texto claro e legível.
+# Base escura para harmonizar com o exemplo fornecido.
+base = "dark"
+primaryColor = "#506874"  # Amarelo vibrante para destacar elementos principais.
+backgroundColor = "#223843"  # Azul escuro para o fundo principal.
+secondaryBackgroundColor = "#18262D"  # Azul médio para separar seções.
+textColor = "#F8F9FA"  # Branco claro para textos legíveis.
 font = "sans serif"
 
 [global]

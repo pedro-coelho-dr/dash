@@ -54,7 +54,7 @@ def plot_sunburst_chart(df):
     # Separar receitas e despesas
     df_receitas = sunburst_data[sunburst_data['Tipo'] == 'Receita'].sort_values(by=['Valor'], ascending=False)
     df_despesas = sunburst_data[sunburst_data['Tipo'] == 'Despesa'].sort_values(by=['Valor'], ascending=False)
-
+"""
     col1, col2 = st.columns(2)
 
     # Tabela de Receitas
@@ -76,7 +76,7 @@ def plot_sunburst_chart(df):
             }))
         else:
             st.write("Nenhuma despesa disponível.")
-
+"""
 
 # Função para gerar gráfico de barras sobrepostas dos saldos por categoria
 def plot_overlapped_bar_chart(df):
@@ -103,42 +103,43 @@ def plot_scatter_chart(df):
     # Separar as categorias por vírgulas e "explodir" em múltiplas linhas
     df_copy['Categorias'] = df_copy['Categorias'].str.split(', ')  # Separar as categorias em listas
     df_exploded = df_copy.explode('Categorias')  # Explodir para múltiplas linhas por categoria
-
-    # Gráfico de Dispersão para Despesas
-    st.subheader("🔍 Valor por Categoria (Despesas)")
-    df_despesas = df_exploded[df_exploded['Tipo'] == 'Despesa']  # Filtrar apenas despesas
-    fig_despesas = px.scatter(df_despesas, x='Categorias', y='Valor', size='Valor',
-                              title='Valor da Despesa por Categoria',
-                              labels={'Categorias': 'Categorias', 'Valor': 'Valor (R$)'},
-                              color_discrete_sequence=['#FF2B2B'])  # Vermelho para despesas
-    fig_despesas.update_layout(
-        width=900,
-        height=500,
-        showlegend=False  # Remover legenda
-    )
-    st.plotly_chart(fig_despesas)
-
-    # Gráfico de Dispersão para Receitas
-    st.subheader("🔍 Valor por Categoria (Receitas)")
-    df_receitas = df_exploded[df_exploded['Tipo'] == 'Receita']  # Filtrar apenas receitas
-    fig_receitas = px.scatter(df_receitas, x='Categorias', y='Valor', size='Valor',
-                              title='Valor da Receita por Categoria',
-                              labels={'Categorias': 'Categorias', 'Valor': 'Valor (R$)'},
-                              color_discrete_sequence=['#09AB3B'])  # Verde para receitas
-    fig_receitas.update_layout(
-        width=900,
-        height=500,
-        showlegend=False  # Remover legenda
-    )
-    st.plotly_chart(fig_receitas)
-
-
+    col1, col2 = st.columns(2)
+    with col1:
+        # Gráfico de Dispersão para Despesas
+        st.subheader("🔍 Valor por Categoria (Despesas)")
+        df_despesas = df_exploded[df_exploded['Tipo'] == 'Despesa']  # Filtrar apenas despesas
+        fig_despesas = px.scatter(df_despesas, x='Categorias', y='Valor', size='Valor',
+                                title='Valor da Despesa por Categoria',
+                                labels={'Categorias': 'Categorias', 'Valor': 'Valor (R$)'},
+                                color_discrete_sequence=['#FF2B2B'])  # Vermelho para despesas
+        fig_despesas.update_layout(
+            width=900,
+            height=500,
+            showlegend=False  # Remover legenda
+        )
+        st.plotly_chart(fig_despesas)
+    
+    with col2:
+        # Gráfico de Dispersão para Receitas
+        st.subheader("🔍 Valor por Categoria (Receitas)")
+        df_receitas = df_exploded[df_exploded['Tipo'] == 'Receita']  # Filtrar apenas receitas
+        fig_receitas = px.scatter(df_receitas, x='Categorias', y='Valor', size='Valor',
+                                title='Valor da Receita por Categoria',
+                                labels={'Categorias': 'Categorias', 'Valor': 'Valor (R$)'},
+                                color_discrete_sequence=['#09AB3B'])  # Verde para receitas
+        fig_receitas.update_layout(
+            width=900,
+            height=500,
+            showlegend=False  # Remover legenda
+        )
+        st.plotly_chart(fig_receitas)
 
 
 
 # Seção de Análise Avançada
 def advanced_analysis():
     st.title("Análise Avançada")
+    st.divider()
 
     df = get_Transactions_Dataframe()
     df['Data'] = pd.to_datetime(df['Data'])
@@ -146,10 +147,17 @@ def advanced_analysis():
     df = filter_df_date(df)
 
     if not df.empty:
-        
-        plot_overlapped_bar_chart(df)
+        st.divider()
+        col1, col2 = st.columns(2)
+        with col1:
+            plot_sunburst_chart(df)
+        with col2:
+            plot_overlapped_bar_chart(df)
+        st.divider()
         plot_scatter_chart(df)
-        plot_sunburst_chart(df)
+        st.divider()
+        
+
     else:
         st.write("Nenhuma transação disponível.")
 

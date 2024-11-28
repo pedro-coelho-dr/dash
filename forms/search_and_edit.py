@@ -59,13 +59,15 @@ def search_all_columns(df, search_term):
 
 # search, display, edit, and delete
 def search_and_edit_transactions():
+    
     df_transactions = get_Transactions_Dataframe()
-
+    
     if df_transactions.empty:
         st.write("Nenhuma transação encontrada.")
     else:
         # Use the filter_df_date function to filter by date
         df_filtered = filter_df_date(df_transactions)
+        st.divider()
         st.subheader("🔍 Pesquisar")
         # Search bar to filter across all columns
         search_term = st.text_input("Pesquisar por termo")
@@ -86,7 +88,7 @@ def search_and_edit_transactions():
         else:
             # Inform how many transactions were found
             st.write(f"**{len(df_filtered)}** transações encontradas:")
-
+            st.divider()
             # Render transactions as cards with Edit and Delete buttons
             render_transactions_as_cards(df_filtered)
 
