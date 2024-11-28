@@ -97,6 +97,8 @@ Oferece funcionalidades para gerenciar os dados financeiros:
 
 ### Vídeo-demo
 
+{{{ ADD VIDEO }}}
+
 ## Previsões
 ### Modelagem
 As previsões financeiras foram feitas utilizando o modelo SARIMA, que é ideal para dados com padrões sazonais e temporais. A modelagem foi aplicada aos saldos mensais e semanais das transações, considerando:
@@ -107,7 +109,7 @@ Dados de treino:
 
 - Semanal: 2 anos de dados de treino, 12 semanas de teste e 4 semanas de previsão, com aplicação de diferenciação para estabilizar a série temporal.
 
-Para mais detalhes sobre a modelagem e exploração dos dados, acesse [exploration.ipynb](exploration/exploration.ipynb)
+[ [exploration.ipynb](exploration/exploration.ipynb) | [sarima.pdf](exploration/sarima.pdf) ]
 
 ### Limitações
 Embora os modelos sejam funcionais, existem limitações:
