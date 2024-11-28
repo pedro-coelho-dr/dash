@@ -7,8 +7,9 @@
 2. [Funcionalidades](#funcionalidades)
 3. [Previsões](#previsões)
 4. [Interface e Visualizações](#interface-e-visualizações)
-5. [Instalação e Execução](#instalação-e-execução)
-6. [Equipe](#equipe)
+5. [Ferramentas](#ferramentas)
+6. [Instalação e Execução](#instalação-e-execução)
+7. [Equipe](#equipe)
 
 ## Dados
 ### Origem e Anonimização
@@ -125,7 +126,18 @@ Embora os modelos sejam funcionais, existem limitações:
 2. **Previsão Semanal**: Mostra a projeção das próximas semanas.
     ![](img/sarima-semanal.bmp)
 
+## Ferramentas
 
+- Python
+- Streamlit
+- SQLite
+- Jupyter Notebook
+- Pandas
+- Numpy
+- Plotly
+- Matplotlib
+- Statsmodels
+  
 ## Instalação e Execução
 ### Requisitos
 - **Python**
@@ -161,6 +173,8 @@ Embora os modelos sejam funcionais, existem limitações:
    ```bash
    streamlit run app.py
    ```
+
+
 
 
 ## Equipe
