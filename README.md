@@ -1,6 +1,9 @@
-# Dash
+![](static/logofull.png)
 
-**Dash** é uma plataforma de gestão financeira desenvolvida para a [**Eceel-Tec**](https://eceel-tec.com.br/), uma empresa de assistência técnica, como parte da disciplina **Projetos 5** dos cursos de **Ciência da Computação** e **Design** da [**Cesar School**](https://cesar.school). O objetivo é facilitar o acompanhamento de **receitas** e **despesas**, além de oferecer **visualizações**, **análises avançadas** e **previsões** dos dados financeiros da empresa.
+
+**Dash** é uma plataforma de gestão financeira desenvolvida para a [**Eceel-Tec**](https://eceel-tec.com.br/), uma empresa de assistência técnica, como parte da disciplina **Projetos 5** dos cursos de **Ciência da Computação** e **Design** da [**Cesar School**](https://cesar.school). O objetivo é facilitar o acompanhamento de **receitas** e **despesas**, além de oferecer **visualizações**, **análises avançadas** e **previsões** dos dados financeiros da empresa.  
+
+
 
 ## Tabela de Conteúdos
 1. [Dados](#dados)
@@ -98,7 +101,7 @@ Oferece funcionalidades para gerenciar os dados financeiros:
 
 ### Vídeo-demo
 
-{{{ ADD VIDEO }}}
+[![](img/yt.png)](https://youtu.be/4o1jFVl1eh8)
 
 ## Previsões
 ### Modelagem

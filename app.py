@@ -5,16 +5,21 @@ from analysis import overview, advanced_analysis, predictions
 # Set the page configuration
 st.set_page_config(
     page_title="Dash",  # Title in the browser tab
-    page_icon="⭐",  # Cloud icon (you can replace with a URL to a custom icon)
+    page_icon="static/logo.png",  # Cloud icon (you can replace with a URL to a custom icon)
     layout="wide",  # Wide layout for better use of space
     initial_sidebar_state="expanded"  # Sidebar starts expanded
 )
 
 
-# Sidebar menu for navigation
-st.sidebar.title("Dash")
+
+LOGO = "static/logofull.png"
+st.sidebar.image(
+    LOGO,
+    use_column_width=True  # Automatically adjust the image to fit the sidebar width
+)
+
 menu_option = st.sidebar.radio(
-    ">>", 
+    "", 
     ["Visão Geral", "Análise Avançada", "Previsões", "Transações"]
 )
 
