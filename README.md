@@ -101,7 +101,7 @@ Oferece funcionalidades para gerenciar os dados financeiros:
 
 ### Vídeo-demo
 
-[![](img/yt.png)](https://youtu.be/4o1jFVl1eh8)
+[![](img/yt.png)](https://youtu.be/10Z3g23rONY)
 
 ## Previsões
 ### Modelagem
